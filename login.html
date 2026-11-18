@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <script type="module" src="auth-global.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - M D Enterprise</title>
+    
+    <link rel="stylesheet" href="desktop.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        .auth-container { display: flex; flex-direction: column; gap: 12px; }
+        .auth-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; }
+        .auth-input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #ced4da; }
+        .btn-google { background-color: #ffffff; color: #757575; border: 1px solid #ddd; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; transition: background-color 0.2s; width: 100%; }
+        .btn-google:hover { background-color: #f1f1f1; }
+        .btn-green { background-color: #2e7d32; color: #ffffff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem; transition: background-color 0.2s; }
+        .btn-green:hover { background-color: #1b5e20; }
+        .btn-logout { background-color: #d9534f; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-logout:hover { background-color: #c9302c; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.82rem; font-weight: bold; }
+        .badge-active { background-color: #e6f4ea; color: #137333; }
+        .badge-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-expired { background-color: #f8d7da; color: #721c24; }
+        .hidden { display: none !important; }
+        .error-message { color: #d9534f; font-size: 0.85rem; margin-top: 5px; }
+        .form-row { display: flex; gap: 10px; }
+        @media (max-width: 600px) { .form-row { flex-direction: column; gap: 12px; } }
+
+        #global-processing-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; color: #ffffff; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #ffffff; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .logout-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 99999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .logout-modal-overlay.active { opacity: 1; visibility: visible; }
+        .logout-modal-box { background: #ffffff; border-radius: 16px; padding: 32px 28px 24px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); transform: scale(0.9) translateY(20px); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); border: 1px solid #e5e7eb; }
+        .logout-modal-overlay.active .logout-modal-box { transform: scale(1) translateY(0); }
+        .logout-modal-icon { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #fef3c7, #fde68a); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 26px; color: #d97706; animation: pulse-icon 2s ease-in-out infinite; }
+        @keyframes pulse-icon { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .logout-modal-title { font-size: 1.35rem; font-weight: 700; color: #1f2937; margin-bottom: 8px; }
+        .logout-modal-message { font-size: 0.95rem; color: #6b7280; line-height: 1.5; margin-bottom: 24px; }
+        .logout-modal-buttons { display: flex; gap: 10px; justify-content: center; }
+        .logout-btn-cancel, .logout-btn-confirm { flex: 1; padding: 12px 20px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s ease; }
+        .logout-btn-cancel { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+        .logout-btn-cancel:hover { background: #e5e7eb; }
+        .logout-btn-confirm { background: linear-gradient(135deg, #d9534f, #c9302c); color: #ffffff; box-shadow: 0 4px 12px rgba(217, 83, 79, 0.3); }
+        .logout-btn-confirm:hover { background: linear-gradient(135deg, #c9302c, #b02420); }
+        @media (max-width: 480px) { .logout-modal-box { padding: 26px 20px 20px; } .logout-modal-title { font-size: 1.2rem; } .logout-modal-message { font-size: 0.9rem; } .logout-btn-cancel, .logout-btn-confirm { padding: 11px 16px; font-size: 0.9rem; } }
+        #profile-completion-alert { background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #f59e0b; }
+    </style>
+</head>
+<body>
+    <div id="global-processing-overlay" class="hidden">
+        <div class="spinner"></div>
+        <h3 id="overlay-status-text" style="margin: 0; font-size: 1.2rem; font-weight: 600;">Updating details...</h3>
+        <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.8;">Please wait, saving your profile...</p>
+    </div>
+
+    <header class="standalone-solid-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="index.html" style="color: #fff; text-decoration: none; font-size: 1.5rem; padding-right: 5px;" title="Go Back Home">&#8592;</a>
+            <div class="logo-container">
+                <img src="images/maurya_logo.png" alt="MD Enterprise">
+                <h1>M D Enterprise</h1>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="store.html">Store</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container" style="max-width: 850px; margin-top: 30px;">
+        <h2 class="section-title">Customer Account & Dashboard</h2>
+
+        <div id="reset-password-section" class="card hidden" style="margin: 0 auto 30px; text-align: left; padding: 25px;">
+            <h3 style="color: var(--primary-purple); margin-bottom: 15px;">🔑 Create New Password</h3>
+            <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">Enter your new password below to reset your account credentials.</p>
+            <form id="reset-password-form" class="auth-container">
+                <input type="password" id="new-password" class="auth-input" placeholder="New Password (min 6 characters)" required minlength="6">
+                <button type="submit" class="btn-primary" style="padding: 12px; border: none; cursor: pointer; border-radius: 6px;">Set New Password</button>
+            </form>
+            <p id="reset-success" style="color: #2e7d32; background-color: #edf7ed; padding: 10px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #c8e6c9; margin-top: 15px;" class="hidden"></p>
+            <p id="reset-error" class="error-message hidden" style="margin-top: 15px;"></p>
+        </div>
+
+        <div id="auth-section" class="hidden" style="margin-bottom: 30px; max-width: 550px; margin-left: auto; margin-right: auto;">
+            <p id="auth-success" style="color: #2e7d32; background-color: #edf7ed; padding: 10px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #c8e6c9; margin-bottom: 15px;" class="hidden"></p>
+            <p id="auth-error" class="error-message hidden" style="margin-bottom: 15px; text-align: center; background-color: #fde8e8; padding: 10px; border-radius: 6px; border: 1px solid #f8b4b4;"></p>
+
+            <div id="login-card" class="card" style="text-align: left; padding: 30px;">
+                <h3 style="color: var(--primary-purple); margin-bottom: 15px;">🔒 Sign In to Your Account</h3>
+                <form id="login-form" class="auth-container">
+                    <input type="email" id="login-email" class="auth-input" placeholder="Email Address *" required>
+                    <input type="password" id="login-password" class="auth-input" placeholder="Password *" required>
+                    <div style="text-align: right; margin-top: -5px;">
+                        <button type="button" id="forgot-password-btn" style="background: none; border: none; color: var(--primary-purple); cursor: pointer; font-size: 0.85rem; text-decoration: underline;">Forgot Password?</button>
+                    </div>
+                    <button type="submit" class="btn-primary" style="padding: 12px; border: none; cursor: pointer; border-radius: 6px; font-weight: 700;">Login</button>
+                </form>
+                <div style="text-align: center; margin: 15px 0; color: #777; font-size: 0.85rem; position: relative;">
+                    <span style="background: #fff; padding: 0 10px; position: relative; z-index: 1;">OR</span>
+                    <hr style="position: absolute; top: 50%; left: 0; width: 100%; border: none; border-top: 1px solid #eee; margin: 0;">
+                </div>
+                <button id="google-signin-btn" class="btn-google">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18"> Sign in with Google
+                </button>
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed #ddd; text-align: center;">
+                    <p style="font-size: 0.88rem; color: #555; margin-bottom: 10px;">New to MD Enterprise?</p>
+                    <button type="button" id="show-signup-btn" class="btn-green">✨ Create New Account</button>
+                </div>
+            </div>
+
+            <div id="signup-card" class="card hidden" style="text-align: left; padding: 30px; background: var(--card-bg);">
+                <h3 style="color: var(--primary-purple); margin-bottom: 5px;">✨ Create Your Account</h3>
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Quick signup — add address later from dashboard.</p>
+                <form id="signup-form" class="auth-container">
+                    <div class="form-row">
+                        <input type="text" id="signup-name" class="auth-input" placeholder="Full Name *" required>
+                        <input type="tel" id="signup-phone" class="auth-input" placeholder="10-digit Mobile *" pattern="[6-9][0-9]{9}" maxlength="10" required>
+                    </div>
+                    <input type="email" id="signup-email" class="auth-input" placeholder="Email Address *" required>
+                    <input type="password" id="signup-password" class="auth-input" placeholder="Create Password (min 6 chars) *" minlength="6" required>
+                    <button type="submit" class="btn-primary" style="padding: 12px; border: none; cursor: pointer; border-radius: 6px; font-weight: 700; margin-top: 10px;">Register Account</button>
+                </form>
+                <div style="margin-top: 20px; text-align: center;">
+                    <p style="font-size: 0.88rem; color: #555;">Already have an account? 
+                        <button type="button" id="show-login-btn" style="background: none; border: none; color: var(--primary-purple); font-weight: bold; cursor: pointer; text-decoration: underline;">Sign In</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="auth-loading" style="text-align: center; padding: 80px 20px;">
+            <div class="spinner" style="margin: 0 auto 20px; border-color: rgba(94, 43, 151, 0.2); border-top-color: var(--primary-purple);"></div>
+            <p style="color: #666; font-size: 0.95rem;">Checking your account...</p>
+        </div>
+
+        <div id="dashboard-section" class="hidden">
+            <div class="card" style="text-align: left; padding: 25px; margin-bottom: 30px; background: var(--card-bg);">
+                <div id="profile-completion-alert" style="display: none;">
+                    <p style="margin: 0; font-size: 0.9rem; color: #92400e; font-weight: 600;">⚠️ Your profile is incomplete!</p>
+                    <p style="margin: 5px 0 10px; font-size: 0.82rem; color: #92400e;">Please add your service address and pincode for smooth service delivery.</p>
+                    <button onclick="document.getElementById('toggle-edit-profile-btn').click()" style="background: #f59e0b; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.82rem;">📝 Complete Profile Now</button>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                    <div>
+                        <h3 style="color: var(--primary-purple); margin-bottom: 5px;">👋 Welcome, <span id="user-display-name">User</span></h3>
+                        <p style="margin-top: 3px; font-size: 0.9rem;"><strong>Email:</strong> <span id="user-display-email"></span></p>
+                    </div>
+                    <div>
+                        <button id="toggle-edit-profile-btn" style="background: var(--primary-purple); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; margin-right: 8px;">✏️ Edit Profile & Address</button>
+                        <button id="logout-btn" class="btn-logout">Logout</button>
+                    </div>
+                </div>
+
+                <div id="profile-display-box" style="background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <p style="font-size: 0.9rem; margin-bottom: 6px;">📞 <strong>Mobile Number:</strong> <span id="user-display-phone">N/A</span></p>
+                    <p style="font-size: 0.9rem; margin-bottom: 6px;">🏠 <strong>Service Address:</strong> <span id="user-display-address">Not Set (Optional)</span></p>
+                    <p style="font-size: 0.9rem; margin-bottom: 0;">📍 <strong>Google Maps Pin:</strong> <span id="user-display-location">Not Set</span></p>
+                </div>
+
+                <form id="edit-profile-form" class="auth-container hidden" style="margin-top: 20px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--primary-purple);">
+                    <h4 style="color: var(--primary-purple); margin-bottom: 5px;">📝 Update Customer Profile Details</h4>
+                    <p style="font-size: 0.82rem; color: #666; margin-bottom: 12px;">You can update your phone, address, state, and pin location anytime.</p>
+                    <div style="margin-bottom: 5px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #555;">Primary Account Email (Read-Only):</label>
+                        <input type="email" id="edit-email-readonly" class="auth-input" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #555;">Account Name (Read-Only):</label>
+                            <input type="text" id="edit-name" class="auth-input" readonly>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #555;">Mobile Number:</label>
+                            <input type="tel" id="edit-phone" class="auth-input" placeholder="Mobile Number (10 digits)" pattern="[6-9][0-9]{9}" maxlength="10">
+                        </div>
+                    </div>
+                    <input type="text" id="edit-address" class="auth-input" placeholder="House No. / Street / Village Address *">
+                    <div class="form-row">
+                        <input type="text" id="edit-city" class="auth-input" placeholder="City / District" value="Barabanki">
+                        <input type="text" id="edit-state" class="auth-input" placeholder="State" value="Uttar Pradesh">
+                        <input type="text" id="edit-pincode" class="auth-input" placeholder="Pincode *" pattern="[0-9]{6}" maxlength="6">
+                    </div>
+                    <input type="url" id="edit-location-url" class="auth-input" placeholder="📍 Google Maps Location Link (Optional)">
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <button type="submit" id="save-profile-submit-btn" class="btn-green" style="padding: 10px; font-size: 0.88rem;">Save Profile Details</button>
+                        <button type="button" id="cancel-edit-btn" style="background: #777; color: #fff; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" style="text-align: left; padding: 30px; margin-bottom: 30px;">
+                <h3 style="color: var(--primary-purple); margin-bottom: 15px;">⭐ Your Active Repair packages & Service Schedules</h3>
+                <div id="plans-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px;">
+                    <p style="color: #666;">Loading active plans...</p>
+                </div>
+            </div>
+
+            <div class="card" style="text-align: left; padding: 30px;">
+                <h3 style="color: var(--primary-purple); margin-bottom: 15px;">🛒 Orders & Service Requests</h3>
+                <div id="orders-container">
+                    <p style="color: #666;">Loading your orders...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 M D Enterprise. All Rights Reserved.</p>
+    </footer>
+
+    <div id="logout-modal" class="logout-modal-overlay">
+        <div class="logout-modal-box">
+            <div class="logout-modal-icon">🚪</div>
+            <h3 class="logout-modal-title">Confirm Logout</h3>
+            <p class="logout-modal-message">Are you sure you want to logout from your account?</p>
+            <div class="logout-modal-buttons">
+                <button id="logout-cancel-btn" class="logout-btn-cancel">Cancel</button>
+                <button id="logout-confirm-btn" class="logout-btn-confirm">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+
+        <script type="module">
+        import { 
+            signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+            updateProfile, sendPasswordResetEmail, confirmPasswordReset
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            collection, doc, setDoc, getDoc, query, where, getDocs 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ✅ 1. auth-global.js load होने का इंतज़ार करो
+        await new Promise(resolve => {
+            if (window.MDAuth) resolve();
+            else window.addEventListener('md-global-ready', resolve, { once: true });
+        });
+
+        // ✅ 2. अब user load होने का इंतज़ार करो (सबसे ज़रूरी)
+        await window.MDWaitForUser();
+
+        // ✅ 3. Master से auth और db लो
+        const auth = window.MDAuth;
+        const db = window.MDDB;
+
+        // ✅ 4. DOM elements
+        const authSection = document.getElementById('auth-section');
+        const loginCard = document.getElementById('login-card');
+        const signupCard = document.getElementById('signup-card');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const resetPasswordSection = document.getElementById('reset-password-section');
+        const authError = document.getElementById('auth-error');
+        const authSuccess = document.getElementById('auth-success');
+        const overlay = document.getElementById('global-processing-overlay');
+        const overlayText = document.getElementById('overlay-status-text');
+        const loadingEl = document.getElementById('auth-loading');
+
+        function showOverlay(msg) { 
+            if (overlayText) overlayText.textContent = msg || "Updating details..."; 
+            if (overlay) overlay.classList.remove('hidden'); 
+        }
+        function hideOverlay() { 
+            if (overlay) overlay.classList.add('hidden'); 
+        }
+
+        // ✅ 5. URL params check (reset password के लिए)
+        const urlParams = new URLSearchParams(window.location.search);
+        const oobCode = urlParams.get('oobCode');
+        const mode = urlParams.get('mode');
+        const redirectParam = urlParams.get('redirect');
+        const tabParam = urlParams.get('tab');
+        const safeRedirect = (redirectParam && /^[a-zA-Z0-9_\-]+\.html(\?[^#]*)?$/.test(redirectParam)) ? redirectParam : null;
+
+        // ✅ 6. Reset Password Mode
+        if (oobCode && mode === 'resetPassword') {
+            if (loadingEl) loadingEl.style.display = 'none';
+            authSection.classList.add('hidden'); 
+            dashboardSection.classList.add('hidden');
+            resetPasswordSection.classList.remove('hidden');
+        } else {
+            // ✅ 7. Normal mode — स्पिनर तुरंत हटाओ
+            if (loadingEl) loadingEl.style.display = 'none';
+
+            // ✅ 8. अब सीधे सही स्क्रीन दिखाओ (user guaranteed loaded है)
+            const user = auth.currentUser;
+            if (user) {
+                authSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+
+                const profile = window.MDUser.profile || {};
+                document.getElementById('user-display-name').textContent = 
+                    profile.fullName || user.displayName || user.email.split('@')[0];
+                document.getElementById('user-display-email').textContent = user.email;
+                document.getElementById('edit-email-readonly').value = user.email;
+                document.getElementById('edit-name').value = profile.fullName || user.displayName || 'Customer';
+
+                // Load profile, plans, orders
+                await loadUserProfile(user.uid);
+                await loadUserPlans(user.uid);
+                await loadUserOrders(user.uid);
+
+                if (tabParam === 'profile') {
+                    document.getElementById('edit-profile-form').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('edit-profile-form').scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                }
+            } else {
+                authSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+            }
+        }
+
+        // ============================================
+        // SHOW/HIDE FORMS
+        // ============================================
+        document.getElementById('show-signup-btn').addEventListener('click', () => {
+            authError.classList.add('hidden'); authSuccess.classList.add('hidden');
+            loginCard.classList.add('hidden'); signupCard.classList.remove('hidden');
+        });
+
+        document.getElementById('show-login-btn').addEventListener('click', () => {
+            authError.classList.add('hidden'); authSuccess.classList.add('hidden');
+            signupCard.classList.add('hidden'); loginCard.classList.remove('hidden');
+        });
+
+        // Edit profile toggle
+        const editProfileBtn = document.getElementById('toggle-edit-profile-btn');
+        const editProfileForm = document.getElementById('edit-profile-form');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+        editProfileBtn.addEventListener('click', () => editProfileForm.classList.toggle('hidden'));
+        cancelEditBtn.addEventListener('click', () => editProfileForm.classList.add('hidden'));
+
+        // ============================================
+        // RESET PASSWORD FORM
+        // ============================================
+        document.getElementById('reset-password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('new-password').value;
+            const resetError = document.getElementById('reset-error');
+            const resetSuccess = document.getElementById('reset-success');
+            resetError.classList.add('hidden'); 
+            resetSuccess.classList.add('hidden');
+            try {
+                await confirmPasswordReset(auth, oobCode, newPassword);
+                resetSuccess.textContent = "✅ Password updated successfully! Redirecting...";
+                resetSuccess.classList.remove('hidden');
+                setTimeout(() => window.location.href = window.location.pathname, 2000);
+            } catch (err) {
+                resetError.textContent = getEnglishErrorMessage(err.code); 
+                resetError.classList.remove('hidden');
+            }
+        });
+
+        // ============================================
+        // AUTH STATE CHANGE (backup)
+        // ============================================
+        onAuthStateChanged(auth, async (user) => {
+            if (oobCode && mode === 'resetPassword') return;
+
+            if (user) {
+                authSection.classList.add('hidden'); 
+                dashboardSection.classList.remove('hidden');
+                
+                document.getElementById('user-display-name').textContent = 
+                    user.displayName || user.email.split('@')[0];
+                document.getElementById('user-display-email').textContent = user.email;
+                document.getElementById('edit-email-readonly').value = user.email;
+                document.getElementById('edit-name').value = user.displayName || 'Customer';
+
+                await loadUserProfile(user.uid);
+                await loadUserPlans(user.uid);
+                await loadUserOrders(user.uid);
+            } else {
+                authSection.classList.remove('hidden'); 
+                dashboardSection.classList.add('hidden');
+                document.getElementById('user-display-name').textContent = 'User'; 
+                document.getElementById('user-display-email').textContent = '';
+                document.getElementById('user-display-phone').textContent = 'N/A'; 
+                document.getElementById('user-display-address').textContent = 'Not Set';
+                document.getElementById('user-display-location').textContent = 'Not Set';
+            }
+        });
+
+        // ============================================
+        // LOAD USER PROFILE
+        // ============================================
+        async function loadUserProfile(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, "users", uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    document.getElementById('user-display-phone').textContent = data.phone || 'N/A';
+                    if (data.address && data.pincode && data.city && data.state) {
+                        const cityState = [data.city, data.state, data.pincode].filter(Boolean).join(', ');
+                        document.getElementById('user-display-address').textContent = `${data.address}${cityState ? ' - ' + cityState : ''}`;
+                        const alertEl = document.getElementById('profile-completion-alert');
+                        if (alertEl) alertEl.style.display = 'none';
+                    } else {
+                        document.getElementById('user-display-address').textContent = '⚠️ Please add your address';
+                        const alertEl = document.getElementById('profile-completion-alert');
+                        if (alertEl) alertEl.style.display = 'block';
+                    }
+                    if (data.locationUrl) {
+                        document.getElementById('user-display-location').innerHTML = `<a href="${data.locationUrl}" target="_blank" style="color: var(--primary-purple); font-weight: bold;">🗺️ View Google Maps Pin</a>`;
+                    } else { 
+                        document.getElementById('user-display-location').textContent = 'Not Set'; 
+                    }
+                    document.getElementById('edit-name').value = data.fullName || auth.currentUser.displayName || 'Customer';
+                    document.getElementById('edit-phone').value = data.phone || ''; 
+                    document.getElementById('edit-address').value = data.address || '';
+                    document.getElementById('edit-city').value = data.city || 'Barabanki'; 
+                    document.getElementById('edit-state').value = data.state || 'Uttar Pradesh';
+                    document.getElementById('edit-pincode').value = data.pincode || ''; 
+                    document.getElementById('edit-location-url').value = data.locationUrl || '';
+                }
+            } catch (err) { 
+                console.error("Error loading profile:", err); 
+            }
+        }
+
+        // ============================================
+        // SAVE PROFILE
+        // ============================================
+        document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) { alert("Session expired. Please sign in again."); return; }
+            
+            showOverlay("Saving your details...");
+            const phoneVal = document.getElementById('edit-phone').value || '';
+            const addressVal = document.getElementById('edit-address').value || '';
+            const cityVal = document.getElementById('edit-city').value || 'Barabanki';
+            const stateVal = document.getElementById('edit-state').value || 'Uttar Pradesh';
+            const pincodeVal = document.getElementById('edit-pincode').value || '';
+            const locationVal = document.getElementById('edit-location-url').value || '';
+            const nameVal = document.getElementById('edit-name').value || user.displayName || 'Customer';
+
+            const updatedData = {
+                fullName: nameVal, phone: phoneVal, email: user.email, address: addressVal,
+                city: cityVal, state: stateVal, pincode: pincodeVal, locationUrl: locationVal,
+                profileCompleted: !!(addressVal && pincodeVal), updatedAt: new Date().toISOString()
+            };
+
+            try {
+                await setDoc(doc(db, "users", user.uid), updatedData, { merge: true });
+                if (window.MDUser && typeof window.MDUser.refresh === 'function') { 
+                    await window.MDUser.refresh(); 
+                }
+                overlayText.textContent = "✅ Profile Details Saved Successfully!";
+                setTimeout(() => {
+                    hideOverlay();
+                    document.getElementById('user-display-phone').textContent = phoneVal || 'N/A';
+                    if (addressVal && pincodeVal) {
+                        const cityState = [cityVal, stateVal, pincodeVal].filter(Boolean).join(', ');
+                        document.getElementById('user-display-address').textContent = `${addressVal}${cityState ? ' - ' + cityState : ''}`;
+                        const alertEl = document.getElementById('profile-completion-alert');
+                        if (alertEl) alertEl.style.display = 'none';
+                    } else { 
+                        document.getElementById('user-display-address').textContent = '⚠️ Please add your address'; 
+                    }
+                    if (locationVal) {
+                        document.getElementById('user-display-location').innerHTML = `<a href="${locationVal}" target="_blank" style="color: var(--primary-purple); font-weight: bold;">🗺️ View Google Maps Pin</a>`;
+                    } else { 
+                        document.getElementById('user-display-location').textContent = 'Not Set'; 
+                    }
+                    editProfileForm.classList.add('hidden');
+                    authSuccess.textContent = "✅ Profile updated successfully!"; 
+                    authSuccess.classList.remove('hidden');
+                    setTimeout(() => authSuccess.classList.add('hidden'), 3000);
+                }, 1500);
+            } catch (err) { 
+                hideOverlay(); 
+                console.error("Error saving profile:", err); 
+                alert("Failed to update profile: " + err.message); 
+            }
+        });
+
+        // ============================================
+        // ERROR MESSAGES
+        // ============================================
+        function getEnglishErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/wrong-password': 
+                case 'auth/invalid-credential': return "❌ Invalid email or password.";
+                case 'auth/user-not-found': return "❌ No account found with this email.";
+                case 'auth/invalid-email': return "❌ Please enter a valid email address.";
+                case 'auth/email-already-in-use': return "❌ This email is already registered.";
+                case 'auth/weak-password': return "❌ Password should be at least 6 characters long.";
+                default: return "❌ An error occurred. Please try again.";
+            }
+        }
+
+        // ============================================
+        // LOGIN FORM
+        // ============================================
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            authError.classList.add('hidden'); 
+            authSuccess.classList.add('hidden');
+            try {
+                await signInWithEmailAndPassword(auth, 
+                    document.getElementById('login-email').value, 
+                    document.getElementById('login-password').value
+                );
+                if (safeRedirect) { window.location.href = safeRedirect; }
+            } catch (err) { 
+                authError.textContent = getEnglishErrorMessage(err.code); 
+                authError.classList.remove('hidden'); 
+            }
+        });
+
+        // ============================================
+        // SIGNUP FORM
+        // ============================================
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            authError.classList.add('hidden'); 
+            authSuccess.classList.add('hidden');
+            const name = document.getElementById('signup-name').value.trim();
+            const phone = document.getElementById('signup-phone').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                await updateProfile(user, { displayName: name });
+                await setDoc(doc(db, "users", user.uid), {
+                    fullName: name, phone: phone, email: email, address: '', city: 'Barabanki',
+                    state: 'Uttar Pradesh', pincode: '', locationUrl: '', profileCompleted: false, 
+                    createdAt: new Date().toISOString()
+                }, { merge: true });
+                if (window.MDUser && typeof window.MDUser.refresh === 'function') { 
+                    await window.MDUser.refresh(); 
+                }
+                if (safeRedirect) { window.location.href = safeRedirect; }
+            } catch (err) {
+                let msg = "❌ An error occurred. Please try again.";
+                if (err.code === 'auth/email-already-in-use') msg = "❌ This email is already registered.";
+                if (err.code === 'auth/weak-password') msg = "❌ Password should be at least 6 characters.";
+                if (err.code === 'auth/invalid-email') msg = "❌ Invalid email format.";
+                authError.textContent = msg; 
+                authError.classList.remove('hidden');
+            }
+        });
+
+        // ============================================
+        // FORGOT PASSWORD
+        // ============================================
+        document.getElementById('forgot-password-btn').addEventListener('click', async () => {
+            authError.classList.add('hidden'); 
+            authSuccess.classList.add('hidden');
+            const email = document.getElementById('login-email').value;
+            if (!email) { 
+                authError.textContent = "❌ Please enter your email address first."; 
+                authError.classList.remove('hidden'); 
+                return; 
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                authSuccess.textContent = `Password reset link sent to ${email}. Check your inbox/spam.`;
+                authSuccess.classList.remove('hidden');
+            } catch (err) { 
+                authError.textContent = getEnglishErrorMessage(err.code); 
+                authError.classList.remove('hidden'); 
+            }
+        });
+
+        // ============================================
+        // GOOGLE SIGN IN
+        // ============================================
+        document.getElementById('google-signin-btn').addEventListener('click', async () => {
+            authError.classList.add('hidden'); 
+            authSuccess.classList.add('hidden');
+            try {
+                const result = await signInWithPopup(auth, new GoogleAuthProvider());
+                const user = result.user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (!userDoc.exists()) {
+                    await setDoc(doc(db, "users", user.uid), {
+                        fullName: user.displayName || '', email: user.email || '', phone: '', address: '',
+                        city: 'Barabanki', state: 'Uttar Pradesh', pincode: '', locationUrl: '', 
+                        profileCompleted: false, createdAt: new Date().toISOString()
+                    }, { merge: true });
+                }
+                if (window.MDUser && typeof window.MDUser.refresh === 'function') { 
+                    await window.MDUser.refresh(); 
+                }
+                if (safeRedirect) { window.location.href = safeRedirect; }
+            } catch (err) { 
+                authError.textContent = getEnglishErrorMessage(err.code); 
+                authError.classList.remove('hidden'); 
+            }
+        });
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        const logoutModal = document.getElementById('logout-modal');
+        const logoutCancelBtn = document.getElementById('logout-cancel-btn');
+        const logoutConfirmBtn = document.getElementById('logout-confirm-btn');
+
+        document.getElementById('logout-btn').addEventListener('click', () => logoutModal.classList.add('active'));
+        logoutCancelBtn.addEventListener('click', () => logoutModal.classList.remove('active'));
+
+        logoutConfirmBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth); 
+localStorage.removeItem('md_user_cache_permanent');
+sessionStorage.removeItem('md_user_cache');
+                window.location.href = 'login.html';
+            } catch (err) { 
+                console.error("Logout error:", err); 
+                logoutModal.classList.remove('active'); 
+                alert("Logout failed. Please try again."); 
+            }
+        });
+
+        logoutModal.addEventListener('click', (e) => { 
+            if (e.target === logoutModal) logoutModal.classList.remove('active'); 
+        });
+        document.addEventListener('keydown', (e) => { 
+            if (e.key === 'Escape' && logoutModal.classList.contains('active')) logoutModal.classList.remove('active'); 
+        });
+
+        // ============================================
+        // LOAD USER PLANS
+        // ============================================
+        async function loadUserPlans(uid) {
+            const plansContainer = document.getElementById('plans-container');
+            try {
+                const q = query(collection(db, "subscriptions"), where("userId", "==", uid));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    plansContainer.innerHTML = `<div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px dashed #ccc; width: 100%;"><p style="margin-bottom: 5px;">No active repair package found.</p><a href="packages.html" class="btn-primary" style="display: inline-block; margin-top: 5px; font-size: 0.85rem; padding: 6px 12px; border-radius: 4px;">Browse Repair Packages ➔</a></div>`;
+                    return;
+                }
+                let html = '';
+                const currentUtcTime = new Date().getTime();
+                querySnapshot.forEach((doc) => {
+                    const plan = doc.data();
+                    const expiryUtcTime = new Date(plan.expiryDate || Date.now()).getTime();
+                    const diffTime = expiryUtcTime - currentUtcTime;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    let badgeHtml = ''; let actionNotice = '';
+                    if (diffDays <= 0) {
+                        badgeHtml = `<span class="status-badge badge-expired">Expired</span>`;
+                        actionNotice = `<p style="font-size: 0.8rem; color: #721c24; margin-top: 8px;">❌ Package has expired. Please renew to continue visits.</p>`;
+                    } else if (diffDays <= 30) {
+                        badgeHtml = `<span class="status-badge badge-warning">⏳ Expires in ${diffDays} Days</span>`;
+                        actionNotice = `<p style="font-size: 0.8rem; color: #856404; margin-top: 8px;">⚠️ Renewal Period Active: Less than 30 days remaining.</p>`;
+                    } else { 
+                        badgeHtml = `<span class="status-badge badge-active">Active (${diffDays} Days Left)</span>`; 
+                    }
+                    html += `
+    <div style="background: #f4faf2; padding: 18px; border-radius: 8px; border-left: 5px solid var(--primary-purple); box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h4 style="color: var(--primary-purple); margin: 0; font-size: 1.1rem;">${plan.planName || 'Annual Repair Package'}</h4>
+            ${badgeHtml}
+        </div>
+        <p style="font-size: 0.88rem; color: #333; margin-bottom: 4px;"><strong>Visits Remaining:</strong> ${plan.remainingVisits || '3/3'} Scheduled Visits</p>
+        <p style="font-size: 0.88rem; color: #333; margin-bottom: 4px;"><strong>Price Paid:</strong> ₹${plan.price || '999'}</p>
+        <p style="font-size: 0.85rem; color: #555; margin-bottom: 4px;"><strong>Assigned Serviceman:</strong> ${plan.technician || 'Barabanki Local Unit'}</p>
+        <p style="font-size: 0.82rem; color: #666; margin-bottom: 0;"><strong>Expiry (UTC):</strong> ${plan.expiryDate ? new Date(plan.expiryDate).toLocaleDateString() : 'N/A'}</p>${actionNotice}
+    </div>`;
+                });
+                plansContainer.innerHTML = html;
+            } catch (err) { 
+                plansContainer.innerHTML = `<p style="color: #666;">No active repair packages found.</p>`; 
+            }
+        }
+
+        // ============================================
+        // LOAD USER ORDERS
+        // ============================================
+        async function loadUserOrders(uid) {
+            const ordersContainer = document.getElementById('orders-container');
+            try {
+                const q = query(collection(db, "orders"), where("userId", "==", uid));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    ordersContainer.innerHTML = `<div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1.5px dashed #ccc; text-align: center;"><p>Your service & store order history is empty. <a href="store.html" style="color: var(--primary-purple); font-weight: bold;">Browse Store ➔</a></p></div>`;
+                    return;
+                }
+                let html = '<ul style="list-style: none; padding: 0;">';
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    html += `<li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;"><div><strong>Order #${doc.id.substring(0, 8)}</strong> - ₹${order.totalAmount}<br><small style="color: #666;">${Array.isArray(order.items) ? order.items.join(', ') : (order.items || 'Hardware Items & Setup')}</small></div><span class="status-badge badge-active">${order.status || 'Completed'}</span></li>`;             
+                });
+                html += '</ul>'; 
+                ordersContainer.innerHTML = html;
+            } catch (err) { 
+                ordersContainer.innerHTML = `<p style="color: #666;">No recent orders found.</p>`; 
+            }
+        }
+    </script>
+</body>
+</html>

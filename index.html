@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <script type="module" src="auth-global.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Enterprise</title>
+
+    <!-- कंप्यूटर के लिए मुख्य CSS -->
+    <link rel="stylesheet" href="desktop.css">
+    
+    <!-- मोबाइल स्क्रीन के लिए अलग CSS (यह सिर्फ मोबाइल या 768px से छोटी स्क्रीन पर ही ऑटोमैटिक एक्टिव होगी) -->
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+      <header id="main-header">
+    <div class="logo-container">
+        <img src="images/maurya_logo.png" alt="Maurya Hardware Logo">
+        <h1>MD Enterprise</h1>
+    </div>
+    
+    <nav style="display: flex; align-items: center; gap: 12px; position: relative;">
+        <!-- 1. सर्च आइकॉन -->
+        <a href="#" class="nav-icon" title="Search" style="color: #fff; font-size: 1.2rem; text-decoration: none;">
+            <button id="searchBtn" style="background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center;" title="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </a>
+
+        <!-- 🛠️ सर्च पॉपअप बॉक्स -->
+        <div id="search-popup" style="display: none; position: absolute; top: 100%; right: 10px; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 320px; z-index: 99999; border: 1px solid #ddd;">
+            <input type="text" id="search-input" placeholder="Search (e.g. repair package 999, plumbing)..." style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; outline: none; transition: border 0.3s;">
+            <div id="search-results" style="margin-top: 10px; max-height: 300px; overflow-y: auto;"></div>
+        </div>
+        
+        <!-- 2. कार्ट / शॉपिंग बैग आइकॉन -->
+        <!-- 2. कार्ट / शॉपिंग बैग आइकॉन -->
+        <a href="cart.html" class="nav-icon" title="Cart" style="color: #fff; font-size: 1.2rem; text-decoration: none; position: relative;">
+            🛍️ <span id="cart-count" style="position: absolute; top: -8px; right: -10px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; display: none;">0</span>
+        </a>
+        <!-- 3. अकाउंट / यूजर आइकॉन -->
+        <a href="login.html" class="nav-icon" title="Account" style="color: #fff; font-size: 1.2rem; text-decoration: none;">👤</a>
+        
+        <!-- 4. 3-लाइन / 3-डॉट मेनू बटन -->
+        <button class="menu-toggle" id="mobile-menu-btn" style="background: none; border: none; color: #fff; font-size: 1.6rem; cursor: pointer; padding: 0 5px;">☰</button>
+        
+        <!-- पॉप-अप होने वाले लिंक्स की सूची -->
+        <ul style="display: none; flex-direction: column; position: absolute; top: 100%; right: 10px; width: 180px; background: rgba(11, 19, 43, 0.98); padding: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); z-index: 9999; gap: 10px; list-style: none; border-radius: 8px;">
+            <li><a href="index.html" style="color: var(--amazon-accent); text-decoration: none; font-weight: 600;">Home</a></li>
+            <li><a href="services.html" style="color: #fff; text-decoration: none; font-weight: 600;">Services</a></li>
+            <li><a href="store.html" style="color: #fff; text-decoration: none; font-weight: 600;">Store</a></li>
+            <li><a href="packages.html" style="color: #fff; text-decoration: none; font-weight: 600;">Annual Packages</a></li>
+            <li><a href="gallery.html" style="color: #fff; text-decoration: none; font-weight: 600;">Gallery</a></li>
+            <li><a href="login.html" id="nav-login-link" style="color: #fff; text-decoration: none; font-weight: 600;">Account</a></li>
+        </ul>
+    </nav>
+</header>
+
+    <!-- Full-Screen Hero Slider with Overlay Icons -->
+    <div class="hero-slider">
+        <!-- Slide 1 -->
+        <div class="slide active">
+            <img src="images/slide_1.png" alt="Maurya hardware Store">
+            <div class="slide-content">
+                <h2>Excellence in Every Tool</h2>
+                <p>"Building trust with strong hardware, paints, and unmatched durability." — M D Enterprises</p>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="slide">
+            <img src="images/slide_2.png" alt="Hardware Tools">
+            <div class="slide-content">
+                <h2>Expert Repair & Maintenance</h2>
+                <p>"Your reliable partner for all heavy tools, equipment, and home fixtures."</p>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="slide">
+            <img src="images/slide_3.png" alt="Repair Services and Annual Packages">
+            <div class="slide-content">
+                <h2>Annual Repair & Care Package</h2>
+                <p>"Get 3 yearly scheduled visits and priority fixes for just ₹999."</p>
+            </div>
+        </div>
+
+        <!-- Quick Purpose Icons Bar Overlayed Directly on the Slide -->
+        <div class="hero-overlay-icons">
+            <a href="services.html" class="icon-card">
+                <span>🛠️</span>
+                <h3>Our Services</h3>
+                <p style="font-size: 0.8rem; color: #555; margin-top: 3px;">View repair & setup options</p>
+            </a>
+            <a href="store.html" class="icon-card">
+                <span>🛒</span>
+                <h3>Our Store</h3>
+                <p style="font-size: 0.8rem; color: #555; margin-top: 3px;">Buy tools & hardware parts</p>
+            </a>
+            <a href="packages.html" class="icon-card">
+                <span>⭐</span>
+                <h3>Packages</h3> 
+                <p style="font-size: 0.8rem; color: #555; margin-top: 3px;">Join & track repair status</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        
+        <!-- Quick Purpose Icons Bar -->
+        <div class="quick-icons-bar">
+            <a href="services.html" class="icon-card">
+                <span>🛠️</span>
+                <h3>Our Services</h3>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">View repair & setup options</p>
+            </a>
+            <a href="store.html" class="icon-card">
+                <span>🛒</span>
+                <h3>Our Store</h3>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Buy tools & hardware parts</p>
+            </a>
+            <a href="packages.html" class="icon-card">
+                <span>⭐</span>
+                <h3> Repair packages</h3>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Join & track repair status</p>
+            </a>
+        </div>
+                       <!-- Featured Store Products -->
+        <h2 class="section-title">Featured Store Products</h2>
+        <div class="grid-container" id="home-products-grid">
+            <p style="text-align: center; width: 100%;">Loading featured products...</p>
+        </div>
+
+        <!-- Show More Button -->
+        <div style="text-align: center; margin-top: 30px; margin-bottom: 40px;">
+            <a href="store.html" class="btn-primary" style="display: inline-block; padding: 12px 30px; font-size: 1rem; border-radius: 8px; text-decoration: none; font-weight: 700; box-shadow: 0 4px 15px rgba(94, 43, 151, 0.3); transition: all 0.3s;">
+                Show More Products &rarr;
+            </a>
+        </div>
+
+         <!-- ============================================
+         ABOUT US SECTION (ONLINE SERVICES & SEO)
+         ============================================ -->
+    <div class="about-premium-section">
+        <h2 class="section-title">Barabanki and Lucknow's One of the Most Trusted Store <span>MD Enterprise is Now Online to Serve</span></h2>
+        <p class="about-subtitle">
+            Book services online, get free price consultations, and expert repairs for Homes, PGs, and Commercial spaces.
+        </p>
+
+        <div class="about-cards-grid">
+            
+            <!-- Card 1: Online & Free Consult -->
+            <div class="about-card">
+                <div class="about-icon">📅</div>
+                <h3>Online Booking & Free Consult</h3>
+                <p>
+                    More than just a hardware shop. Book plumbers online, upload your current plumber's slip, and get a <strong>free price comparison</strong> before you decide.
+                </p>
+            </div>
+
+            <!-- Card 2: Full Spectrum Services -->
+            <div class="about-card">
+                <div class="about-icon">🛠️</div>
+                <h3>All Types of Services</h3>
+                <p>
+                    From regular home checkups and custom repairs to full-scale projects for <strong>Residential, PG/Hostel, and Commercial</strong> spaces. We handle it all.
+                </p>
+            </div>
+
+            <!-- Card 3: Trust & Reach -->
+            <div class="about-card">
+                <div class="about-icon">🏆</div>
+                <h3>Top-Rated in Barabanki & Lucknow</h3>
+                <p>
+                    Recognized as one of the best hardware suppliers and plumbing experts in Barabanki, now extending our premium services to the Lucknow region.
+                </p>
+            </div>
+
+        </div>
+    </div>
+        <!-- ============================================
+         OUR RECENT WORK / GALLERY PREVIEW (HORIZONTAL SLIDER)
+         ============================================ -->
+    <div style="margin-top: 60px; margin-bottom: 40px;">
+        <h2 class="section-title" style="font-size: 2rem; margin-bottom: 10px;">Our Store</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 1rem;">Take a look at our hardware store, premium products, and the expert services we provide.</p>
+        
+        <!-- स्लाइडर कंटेनर -->
+        <div style="display: flex; overflow-x: auto; gap: 15px; padding: 10px 5px 20px 5px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;" class="home-gallery-slider">
+            
+            <!-- Photo 1: Store Front -->
+            <a href="gallery.html" style="flex: 0 0 280px; scroll-snap-align: start; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-decoration: none; position: relative; display: block;">
+                <img src="images/store-front.jpg" alt="Store Front" style="width: 100%; height: 200px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onerror="this.src='https://via.placeholder.com/400x300?text=Store+Front'">
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 15px 10px; color: #fff; font-weight: 600; font-size: 1rem;">
+                    Our Hardware Store
+                </div>
+            </a>
+
+        
+
+            <!-- Photo 3: Bathroom Fittings -->
+            <a href="gallery.html" style="flex: 0 0 280px; scroll-snap-align: start; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-decoration: none; position: relative; display: block;">
+                <img src="images/bathroom-1.jpg" alt="Bathroom" style="width: 100%; height: 200px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onerror="this.src='https://via.placeholder.com/400x300?text=Bathroom'">
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 15px 10px; color: #fff; font-weight: 600; font-size: 1rem;">
+                    Premium Sanitary
+                </div>
+            </a>
+
+            <!-- Photo 4: Paints -->
+            <a href="gallery.html" style="flex: 0 0 280px; scroll-snap-align: start; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-decoration: none; position: relative; display: block;">
+                <img src="images/paints-1.jpg" alt="Paints" style="width: 100%; height: 200px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onerror="this.src='https://via.placeholder.com/400x300?text=Paints'">
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 15px 10px; color: #fff; font-weight: 600; font-size: 1rem;">
+                    Premium Paints
+                </div>
+            </a>
+
+            <!-- Photo 5: Technician -->
+            <a href="gallery.html" style="flex: 0 0 280px; scroll-snap-align: start; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-decoration: none; position: relative; display: block;">
+                <img src="images/technician-1.jpg" alt="Technician" style="width: 100%; height: 200px; object-fit: cover; display: block; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onerror="this.src='https://via.placeholder.com/400x300?text=Technician'">
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 15px 10px; color: #fff; font-weight: 600; font-size: 1rem;">
+                    Expert Technicians
+                </div>
+            </a>
+        </div>
+
+        <!-- More Button -->
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="gallery.html" class="btn-primary" style="display: inline-block; padding: 12px 30px; font-size: 1rem; border-radius: 8px; text-decoration: none; font-weight: 700; box-shadow: 0 4px 15px rgba(94, 43, 151, 0.3);">
+                View Full Gallery &rarr;
+            </a>
+        </div>
+    </div>
+
+   <!-- Google Map Box Section with Store Pin Location -->
+<div class="map-section">
+    <h2 style="color: var(--primary-purple); font-size: 1.4rem; margin-bottom: 6px;">Find Us on Google Maps</h2>
+    <p><strong>Address:</strong> Nagar Modd, Dewa Chinaht Road, Barethi, 225003, Barabanki, Uttar Pradesh</p>
+    
+    <div class="map-box">
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2695.0167642163206!2d81.1161965948769!3d26.963853524878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399be34e76d1a2d1%3A0x25bde824b662ea5b!2sMaurya%20Hardware%20%26%20Paints!5e0!3m2!1sen!2sin!4v1791346685397!5m2!1sen!2sin" 
+            width="100%" 
+            height="100%" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>
+    </div>
+</div>
+       <!-- Dark Background Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>MD Enterprise</h3>
+                <p>Your trusted destination for professional hardware tools, home fixtures, industrial equipment, and premium paints.</p>
+                
+                <!-- 📞 Phone (Text ke sath line mein) -->
+                <p style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-phone" style="color: #febd69; font-size: 1.1rem;"></i> 
+                    <a href="tel:+919918582184">+91 99185-82184</a>
+                </p>
+
+                <!-- ✉️ Email (Text ke sath line mein) -->
+                <p style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-envelope" style="color: #febd69; font-size: 1.1rem;"></i> 
+                    <a href="mailto:mauryahardware11@gmail.com">mauryahardware11@gmail.com</a>
+                </p>
+            </div>
+
+            <!-- इसे अपने Footer में जोड़ें -->
+<div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+    <a href="about.html" style="color: #bbb; text-decoration: none; font-size: 0.85rem;">About Us</a>
+    <a href="gallery.html" style="color: #bbb; text-decoration: none; font-size: 0.85rem;">Gallery</a>
+    <a href="terms.html" style="color: #bbb; text-decoration: none; font-size: 0.85rem;">Terms & Conditions</a>
+    <a href="refund.html" style="color: #bbb; text-decoration: none; font-size: 0.85rem;">Refund Policy</a>
+    <a href="privacy.html" style="color: #bbb; text-decoration: none; font-size: 0.85rem;">Privacy Policy</a>
+</div>
+            
+            <div class="footer-col">
+                <h3>Store Address</h3>
+                <p>📍 Nagar Modd, Dewa Chinaht Road, Barethi, 225003</p>
+                <p>Barabanki, Uttar Pradesh</p>
+                
+                <!-- ========================================== -->
+                <!-- ✅ सिर्फ 3 आइकॉन्स (बिना टेक्स्ट के) -->
+                <!-- ========================================== -->
+                <div style="margin-top: 15px; display: flex; align-items: center; gap: 15px;">
+                    
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/md_enterprises0377" target="_blank" title="Instagram" style="color: #E1306C; font-size: 1.5rem; text-decoration: none; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <!-- WhatsApp -->
+                    <a href="https://wa.me/917704810377?text=Hi%20Maurya%20Hardware,%20I%20found%20you%20on%20your%20website%20and%20want%20to%20know%20more." target="_blank" title="WhatsApp" style="color: #25D366; font-size: 1.5rem; text-decoration: none; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+
+                    <!-- Email -->
+                    <a href="mailto:mauryahardware11@gmail.com" title="Email Us" style="color: #ea4335; font-size: 1.5rem; text-decoration: none; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding-top: 20px;">
+                <p style="margin: 0; color: #888888; font-size: 0.85rem;">
+                    &copy; 2026 MD Enterprise. All Rights Reserved.
+                    <a href="admin.html" title="Admin Access" style="color: #666; font-size: 0.7rem; opacity: 0.3; text-decoration: none; margin-left: 15px; transition: 0.3s;" onmouseover="this.style.opacity='1'; this.style.color='#0b132b';" onmouseout="this.style.opacity='0.3'; this.style.color='#666';">
+                        ⚙️
+                    </a>
+                </p>
+                <a href="https://barabanks.netlify.app/" target="_blank" class="designed-by-barabanks">
+                    ⚡ Designed by <span class="brand-name">Barabanks</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+            <script>
+        // 1. हेडर स्क्रॉल इफ़ेक्ट 
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('shrink');
+            } else {
+                header.classList.remove('shrink');
+            }
+        });
+
+        // 2. 3-लाइन मेनू टॉगल स्क्रिप्ट
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const navList = document.querySelector('#main-header nav ul');
+
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navList.classList.toggle('active');
+        });
+
+        document.addEventListener('click', () => {
+            navList.classList.remove('active');
+        });
+
+        // 3. हीरो स्लाइडर (इमेज बदलने वाला)
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function autoSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        setInterval(autoSlide, 4500);
+
+        // 4. होम पेज पर JSON से फीचर्ड प्रोडक्ट्स लोड करना
+       // 4. होम पेज पर Google Sheet API से 5-6 प्रोडक्ट्स सिंक करना
+        document.addEventListener('DOMContentLoaded', () => {
+            const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbzGwlweGrzwTi3CCH-oj8ATzBpVK19WfPPxgcL7QokH78OUV8DAMg1XRzmMc2OGbe3_WQ/exec';
+
+            const grid = document.getElementById('home-products-grid');
+            if (!grid) return;
+
+            fetch(GOOGLE_SHEET_API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    const products = data.filter(item => item.type === 'product');
+                    const featuredProducts = products.slice(0, 6); // 👈 यहाँ से सिर्फ पहले 5-6 प्रोडक्ट्स ही दिखेंगे
+
+                    grid.innerHTML = '';
+
+                    if (featuredProducts.length === 0) {
+                        grid.innerHTML = '<p style="text-align: center; width: 100%;">No products found.</p>';
+                        return;
+                    }
+
+                    let htmlContent = '';
+                    featuredProducts.forEach(product => {
+                        htmlContent += `
+                            <div class="card" id="${product.id}">
+                                <img src="${product.imageUrl || 'https://via.placeholder.com/150'}" alt="${product.title}" style="width: 100%; height: 150px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; background: #f9f9f9;">
+                                <h3>${product.title}</h3>
+                                <p style="font-weight: bold; color: var(--primary-purple);">₹${product.price}</p>
+                                <div style="margin-top: 10px;">
+                                    <a href="store.html" class="btn-cart" style="display: block; text-align: center; text-decoration: none; background: #f3f4f6; color: #333; padding: 6px; border-radius: 6px;">View in Store</a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    grid.innerHTML = htmlContent;
+                })
+                .catch(error => {
+                    console.error('Error loading featured products:', error);
+                    grid.innerHTML = '<p style="text-align: center; width: 100%; color: #666;">Could not load store products.</p>';
+                });
+        });
+        // 5. 🧠 स्मार्ट मल्टीपर्पज सर्च बार लॉजिक
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchBtn = document.getElementById('searchBtn');
+            const searchPopup = document.getElementById('search-popup');
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            let searchData = [];
+
+            fetch('https://script.google.com/macros/s/AKfycbzGwlweGrzwTi3CCH-oj8ATzBpVK19WfPPxgcL7QokH78OUV8DAMg1XRzmMc2OGbe3_WQ/exec')
+    .then(res => res.json())
+    .then(data => { 
+        // चूंकि Google Sheet API सीधे ऐरे नहीं देता, हमें इसे फ़िल्टर करना होगा
+        // मान लें कि डेटा में type, title, price, link है
+        searchData = data; 
+    })
+    .catch(err => console.error("Search data load error:", err));
+
+            // सर्च आइकॉन क्लिक
+            searchBtn.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                if (searchPopup.style.display === 'none') {
+                    searchPopup.style.display = 'block';
+                    searchInput.focus();
+                } else {
+                    searchPopup.style.display = 'none';
+                }
+            });
+
+            // बाहर क्लिक करने पर बंद
+            document.addEventListener('click', (e) => {
+                if (!searchPopup.contains(e.target) && e.target !== searchBtn && !searchBtn.contains(e.target)) {
+                    searchPopup.style.display = 'none';
+                }
+            });
+
+            // टाइप करते ही स्मार्ट सर्च
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                searchResults.innerHTML = '';
+
+                if (query.length < 2) {
+                    searchResults.innerHTML = '<p style="color:#666; font-size:0.85rem; text-align:center;">Type at least 2 letters...</p>';
+                    return;
+                }
+
+                const matches = searchData.filter(item => {
+                    const title = item.title.toLowerCase();
+                    const type = item.type.toLowerCase();
+                    const price = item.price ? item.price.toString() : '';
+
+                   // 1. "package" या "repair" या "package"
+if (query.includes('package') || query.includes('repair')) {
+    if (type !== 'package') return false;
+}
+                    
+                    // 2. "service"
+                    if (query.includes('service')) {
+                        if (type !== 'service') return false;
+                    }
+
+                    // 3. "product" या "store"
+                    if (query.includes('product') || query.includes('store')) {
+                        if (type !== 'product') return false;
+                    }
+
+                    // 4. प्राइस मैचिंग (जैसे 499, 999)
+                    const numberMatch = query.match(/\d+/);
+                    if (numberMatch) {
+                        const searchPrice = numberMatch[0];
+                        if (!price.includes(searchPrice)) return false;
+                    }
+
+                    // 5. टेक्स्ट मैचिंग
+                    const textQuery = query.replace(/package|repair|service|product|store|\d+/g, '').trim();
+                    if (textQuery.length > 0) {
+                        return title.includes(textQuery);
+                    }
+                    return true; 
+                });
+
+                if (matches.length === 0) {
+                    searchResults.innerHTML = '<p style="color:#666; font-size:0.85rem; text-align:center;">No results found.</p>';
+                    return;
+                }
+
+                let html = '';
+                matches.forEach(item => {
+                    let icon = item.type === 'product' ? '🛒' : (item.type === 'service' ? '🛠️' : '⭐');
+
+                    html += `
+                        <a href="${item.link}" style="display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #333; transition: background 0.2s;" onmouseover="this.style.background='#f4faf2'" onmouseout="this.style.background='#fff'">
+                            <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary-purple);">${icon} ${item.title}</div>
+                            <div style="font-size: 0.8rem; color: #666;">₹${item.price} • ${item.type.toUpperCase()}</div>
+                        </a>
+                    `;
+                });
+                searchResults.innerHTML = html;
+            });
+        });
+    </script>
+<!-- Floating WhatsApp Button with SVG Icon -->
+<a href="https://wa.me/917704810377?text=Hi%20Maurya%20Hardware,%20I%20found%20you%20on%20your%20website%20and%20need%20some%20assistance." class="whatsapp-float" target="_blank" title="Chat on WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="#ffffff">
+        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.75 14.19c-.25.7-1.43 1.33-1.97 1.41-.52.08-1.18.12-3.8-1.01-3.18-1.38-5.26-4.63-5.42-4.85-.16-.22-1.28-1.7-1.28-3.25 0-1.55.81-2.31 1.1-2.62.28-.31.62-.39.83-.39.21 0 .42 0 .61.01.19 0 .45-.07.7.53.25.6 0.85 2.08.93 2.23.08.15.13.33.03.53-.1.2-.15.33-.3.51-.15.18-.32.4-.46.54-.15.15-.31.31-.13.61.18.3 0.79 1.3 1.69 2.11 1.16 1.03 2.14 1.35 2.44 1.5.3.15.48.13.66-.08.18-.21.78-.91.99-1.22.21-.31.42-.26.7-.15.28.11 1.78.84 2.08.99.3.15.5.23.57.35.07.12.07.7-.18 1.4z"/>
+    </svg>
+</a>
+</body>
+</html>

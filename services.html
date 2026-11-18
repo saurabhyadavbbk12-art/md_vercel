@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script> 
+    <link rel="manifest" href="/manifest.json">
+    <script type="module" src="auth-global.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services - MD Enterprise</title>
+    
+    <link rel="stylesheet" href="desktop.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ============================================
+           SERVICES HERO
+           ============================================ */
+        .services-hero {
+            text-align: center;
+            padding: 40px 20px 30px;
+            background: linear-gradient(135deg, #f4faf2 0%, #eaf4e8 100%);
+            margin-bottom: 20px;
+        }
+
+        .services-hero h1 {
+            color: var(--primary-purple);
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .services-hero p {
+            color: #555;
+            font-size: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           FLOATING RATE COMPARISON BUTTON
+           ============================================ */
+        .consultation-float-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 25px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.9rem;
+            box-shadow: 
+                0 4px 12px rgba(245, 158, 11, 0.4),
+                0 8px 24px rgba(245, 158, 11, 0.3);
+            z-index: 9998;
+            cursor: pointer;
+            border: 2px solid #fff;
+            animation: float-pulse 2.5s ease-in-out infinite;
+            transition: transform 0.3s ease;
+            font-family: inherit;
+        }
+
+        .consultation-float-btn:hover {
+            transform: scale(1.08);
+            animation: none;
+        }
+
+        @keyframes float-pulse {
+            0%, 100% {
+                box-shadow: 
+                    0 4px 12px rgba(245, 158, 11, 0.4),
+                    0 8px 24px rgba(245, 158, 11, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 
+                    0 4px 20px rgba(245, 158, 11, 0.6),
+                    0 12px 32px rgba(245, 158, 11, 0.5);
+                transform: scale(1.03);
+            }
+        }
+
+        /* ============================================
+           INLINE RATE COMPARISON BANNER (TOP)
+           ============================================ */
+        .consultation-link-banner {
+            max-width: 900px;
+            margin: 25px auto 35px;
+            padding: 22px 28px;
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border: 2px dashed #f59e0b;
+            border-radius: 14px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            animation: glow-border 3s ease-in-out infinite;
+        }
+
+        .consultation-link-banner:hover {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.3);
+            border-style: solid;
+        }
+
+        @keyframes glow-border {
+            0%, 100% { box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15); }
+            50% { box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35); }
+        }
+
+        .consultation-link-banner .banner-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #92400e;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .consultation-link-banner .banner-subtitle {
+            font-size: 0.88rem;
+            color: #b45309;
+            display: block;
+        }
+
+        .consultation-link-banner .banner-arrow {
+            font-size: 1.5rem;
+            margin-left: 10px;
+            display: inline-block;
+            animation: bounce-arrow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounce-arrow {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(8px); }
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 40px auto 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary-purple);
+            max-width: 1300px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .section-header h2 {
+            color: var(--primary-purple);
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .section-header .section-icon { font-size: 2rem; }
+
+        .section-header .section-tag {
+            margin-left: auto;
+            background: var(--primary-purple);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .section-header.commercial { border-bottom-color: #1c2541; }
+        .section-header.commercial h2 { color: #1c2541; }
+        .section-header.commercial .section-tag { background: #1c2541; }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1300px;
+            margin: 0 auto 30px;
+            padding: 0 20px;
+        }
+
+        /* 3D Service Card */
+        .service-card-3d {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 28px 24px 24px;
+            position: relative;
+            border: 1px solid rgba(94, 43, 151, 0.15);
+            box-shadow: 
+                0 1px 2px rgba(94, 43, 151, 0.05),
+                0 4px 8px rgba(94, 43, 151, 0.06),
+                0 12px 24px rgba(94, 43, 151, 0.08);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .service-card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-purple), #7c3aed);
+            border-radius: 14px 14px 0 0;
+        }
+
+        .service-card-3d:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 4px 8px rgba(94, 43, 151, 0.08),
+                0 12px 24px rgba(94, 43, 151, 0.12),
+                0 24px 48px rgba(94, 43, 151, 0.15);
+            border-color: rgba(94, 43, 151, 0.3);
+        }
+
+        .service-card-3d .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f4faf2, #e8f2e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 18px;
+            box-shadow: 
+                inset 0 2px 4px rgba(255, 255, 255, 0.8),
+                0 4px 8px rgba(94, 43, 151, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .service-card-3d:hover .card-icon {
+            transform: scale(1.05) rotate(-3deg);
+            background: linear-gradient(135deg, #e8f2e5, #d4ebcf);
+        }
+
+        .service-card-3d h3 {
+            color: var(--primary-purple);
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+
+        .service-card-3d p {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0 0 18px 0;
+            flex-grow: 1;
+        }
+
+        .service-card-3d .features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 18px 0;
+        }
+
+        .service-card-3d .features li {
+            font-size: 0.85rem;
+            color: #444;
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-card-3d .features li::before {
+            content: '✓';
+            color: #2e7d32;
+            font-weight: 800;
+        }
+
+        .service-card-3d .price-tag {
+            color: #2e7d32;
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .service-card-3d .price-tag small {
+            color: #888;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .service-card-3d .btn-book {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 20px;
+            background: linear-gradient(135deg, var(--primary-purple), #7c3aed);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(94, 43, 151, 0.15);
+            font-family: inherit;
+        }
+
+        .service-card-3d .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(94, 43, 151, 0.25);
+        }
+
+        .service-card-3d .custom-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid rgba(94, 43, 151, 0.2);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            resize: none;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            background: #f9fbf8;
+            box-sizing: border-box;
+        }
+
+        .service-card-3d .custom-input:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(94, 43, 151, 0.1);
+        }
+
+        /* Commercial */
+        .service-card-3d.commercial { border-color: rgba(28, 37, 65, 0.15); }
+        .service-card-3d.commercial::before {
+            background: linear-gradient(90deg, #1c2541, #3a4d8f);
+        }
+        .service-card-3d.commercial h3 { color: #1c2541; }
+        .service-card-3d.commercial .card-icon {
+            background: linear-gradient(135deg, #e8efff, #d4dff5);
+        }
+        .service-card-3d.commercial .btn-book {
+            background: linear-gradient(135deg, #1c2541, #3a4d8f);
+        }
+
+        /* ============================================
+           BIG RATE COMPARISON SECTION
+           ============================================ */
+        .big-consultation-section {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 45px 30px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 24px rgba(245, 158, 11, 0.25),
+                0 16px 48px rgba(245, 158, 11, 0.2);
+            border: 3px solid #fff;
+        }
+
+        .big-consultation-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+            animation: rotate-glow 15s linear infinite;
+        }
+
+        @keyframes rotate-glow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .big-consultation-section > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .big-consultation-section .big-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            animation: pulse-red 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .big-consultation-section h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #78350f;
+            margin-bottom: 12px;
+            animation: text-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes text-glow {
+            0%, 100% {
+                text-shadow: 0 2px 8px rgba(120, 53, 15, 0.15);
+            }
+            50% {
+                text-shadow: 
+                    0 4px 12px rgba(120, 53, 15, 0.25),
+                    0 0 20px rgba(251, 191, 36, 0.5);
+            }
+        }
+
+        .big-consultation-section p {
+            font-size: 1.05rem;
+            color: #92400e;
+            margin-bottom: 28px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .big-consultation-section .big-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 42px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
+            transition: all 0.3s ease;
+            border: 3px solid #fff;
+            animation: big-btn-pulse 2s ease-in-out infinite;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .big-consultation-section .big-cta-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 12px 32px rgba(220, 38, 38, 0.5);
+            animation: none;
+        }
+
+        @keyframes big-btn-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .big-consultation-section .big-features {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px dashed rgba(120, 53, 15, 0.2);
+        }
+
+        .big-consultation-section .big-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #78350f;
+            font-weight: 600;
+        }
+
+        .big-consultation-section .big-feature .check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #16a34a;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        /* Services CTA */
+        .services-cta {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #0b132b, #1c2541);
+            border-radius: 16px;
+            margin: 40px auto;
+            max-width: 900px;
+            color: #fff;
+        }
+
+        .services-cta h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .services-cta p {
+            opacity: 0.9;
+            margin-bottom: 22px;
+        }
+
+        .services-cta .cta-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .services-cta .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+        }
+
+        .services-cta .cta-btn-primary {
+            background: #25d366;
+            color: #fff;
+        }
+
+        .services-cta .cta-btn-primary:hover {
+            background: #20ba5a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .services-cta .cta-btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .services-cta .cta-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           MODALS
+           ============================================ */
+        .modal-overlay-cons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay-cons.active { display: flex; }
+
+        .modal-box-cons {
+            background: #fff;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header-cons {
+            padding: 22px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 18px 18px 0 0;
+        }
+
+        .modal-header-cons.login { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+        .modal-header-cons.profile { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+        .modal-header-cons.form { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
+
+        .modal-header-cons .icon { font-size: 2rem; }
+
+        .modal-header-cons h3 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: #1f2937;
+            font-weight: 800;
+        }
+
+        .modal-body-cons { padding: 25px; }
+
+        .modal-body-cons p {
+            font-size: 0.92rem;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .modal-body-cons .check-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0 20px 0;
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .modal-body-cons .check-list li {
+            padding: 6px 0;
+            font-size: 0.88rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body-cons .check-list li.missing {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .modal-body-cons .check-list li.ok { color: #16a34a; }
+
+        .modal-buttons-cons {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn-cons {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #5e2b97, #7c3aed);
+            color: #fff;
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(94, 43, 151, 0.3);
+        }
+
+        .modal-btn-whatsapp {
+            background: #25d366;
+            color: #fff;
+        }
+
+        .modal-btn-whatsapp:hover {
+            background: #20ba5a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
+        }
+
+        .modal-btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .modal-btn-secondary:hover { background: #e5e7eb; }
+
+        /* Form Fields */
+        .form-group-cons { margin-bottom: 16px; }
+
+        .form-group-cons label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #333;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .form-group-cons .required { color: #dc2626; }
+
+        .form-input-cons {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input-cons:focus {
+            outline: none;
+            border-color: #5e2b97;
+            box-shadow: 0 0 0 3px rgba(94, 43, 151, 0.1);
+        }
+
+        textarea.form-input-cons {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* File Upload */
+        .file-upload-box {
+            border: 2px dashed #5e2b97;
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9fbf8;
+            margin-bottom: 12px;
+        }
+
+        .file-upload-box:hover {
+            background: #f0f9ff;
+            border-color: #7c3aed;
+        }
+
+        .file-upload-box .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+
+        .file-upload-box .upload-title {
+            font-weight: 700;
+            color: #5e2b97;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .file-upload-box .upload-hint { font-size: 0.78rem; color: #666; }
+
+        .file-preview {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .file-preview .file-name {
+            flex: 1;
+            color: #2e7d32;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-preview .file-remove {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #1e40af;
+            margin-bottom: 18px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .info-box .info-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+        /* Success Screen */
+        .success-screen { text-align: center; padding: 20px; }
+
+        .success-screen .success-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: success-pop 0.5s ease;
+        }
+
+        @keyframes success-pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .success-screen h2 {
+            color: #16a34a;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .success-screen p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .reference-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px dashed #f59e0b;
+        }
+
+        .reference-box .ref-label {
+            font-size: 0.78rem;
+            color: #92400e;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .reference-box .ref-id {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #78350f;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .reference-box .ref-hint { font-size: 0.8rem; color: #92400e; }
+
+        /* ============================================
+           MOBILE RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .services-hero { padding: 25px 15px 20px; }
+            .services-hero h1 { font-size: 1.5rem; }
+            .services-hero p { font-size: 0.85rem; }
+
+            .consultation-float-btn {
+                bottom: 85px;
+                right: 15px;
+                padding: 10px 16px;
+                font-size: 0.75rem;
+                gap: 6px;
+            }
+
+            .consultation-link-banner {
+                margin: 15px 12px 25px;
+                padding: 18px 20px;
+                border-radius: 12px;
+            }
+            .consultation-link-banner .banner-title { font-size: 0.95rem; }
+            .consultation-link-banner .banner-subtitle { font-size: 0.75rem; }
+            .consultation-link-banner .banner-arrow { font-size: 1.2rem; }
+
+            .section-header {
+                margin: 25px 0 18px;
+                padding-left: 15px;
+                padding-right: 15px;
+                gap: 10px;
+            }
+
+            .section-header h2 { font-size: 1.15rem; }
+            .section-header .section-icon { font-size: 1.4rem; }
+            .section-header .section-tag { font-size: 0.6rem; padding: 3px 9px; }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 0 12px;
+                margin-bottom: 20px;
+            }
+
+            .service-card-3d { padding: 20px 18px 18px; border-radius: 12px; }
+
+            .service-card-3d .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.4rem;
+                margin-bottom: 14px;
+            }
+
+            .service-card-3d h3 { font-size: 1rem; }
+            .service-card-3d p { font-size: 0.82rem; margin-bottom: 14px; }
+            .service-card-3d .features li { font-size: 0.78rem; }
+            .service-card-3d .price-tag { font-size: 1rem; margin-bottom: 12px; }
+            .service-card-3d .btn-book { padding: 10px 16px; font-size: 0.82rem; width: 100%; }
+
+            .big-consultation-section {
+                margin: 35px 12px;
+                padding: 30px 18px;
+                border-radius: 16px;
+                border-width: 2px;
+            }
+            .big-consultation-section .big-badge {
+                padding: 6px 16px;
+                font-size: 0.7rem;
+                margin-bottom: 14px;
+            }
+            .big-consultation-section h2 { font-size: 1.4rem; margin-bottom: 10px; }
+            .big-consultation-section p { font-size: 0.85rem; margin-bottom: 22px; }
+            .big-consultation-section .big-cta-btn {
+                padding: 14px 26px;
+                font-size: 0.9rem;
+                width: 100%;
+                justify-content: center;
+                border-width: 2px;
+            }
+            .big-consultation-section .big-features {
+                gap: 10px;
+                margin-top: 22px;
+                padding-top: 18px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .big-consultation-section .big-feature { font-size: 0.8rem; }
+
+            .services-cta { padding: 28px 16px; margin: 30px 12px; border-radius: 12px; }
+            .services-cta h3 { font-size: 1.1rem; }
+            .services-cta p { font-size: 0.82rem; }
+            .services-cta .cta-btn {
+                padding: 10px 18px;
+                font-size: 0.82rem;
+                flex: 1;
+                justify-content: center;
+            }
+
+            .modal-box-cons { max-width: 100%; max-height: 95vh; }
+            .modal-header-cons { padding: 16px 18px; }
+            .modal-header-cons h3 { font-size: 1rem; }
+            .modal-body-cons { padding: 18px; }
+            .modal-btn-cons { padding: 11px 16px; font-size: 0.82rem; }
+            .reference-box .ref-id { font-size: 1.4rem; }
+        }
+
+        @media (max-width: 400px) {
+            .services-hero h1 { font-size: 1.3rem; }
+            .section-header h2 { font-size: 1rem; }
+            .service-card-3d h3 { font-size: 0.95rem; }
+            .big-consultation-section h2 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================
+         FLOATING RATE COMPARISON BUTTON
+         ============================================ -->
+    <button class="consultation-float-btn" onclick="openConsultation()">
+        <span>🎁</span>
+        <span>FREE Rate Comparison</span>
+    </button>
+
+    <header class="standalone-solid-header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="index.html" style="color: #fff; text-decoration: none; font-size: 1.5rem; padding-right: 5px;" title="Go Back Home">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
+        <div class="logo-container">
+            <img src="images/maurya_logo.png" alt="MD Enterprise">
+            <h1>MD Enterprise</h1>
+        </div>
+    </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="store.html">Store</a></li>
+                <li><a href="packages.html">Packages</a></li>
+                <li><a href="login.html" id="nav-login-link">👤</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ============================================
+         SERVICES HERO
+         ============================================ -->
+    <div class="services-hero">
+        <h1>🔧 Our Professional Services</h1>
+        <p>Complete plumbing, hardware, and maintenance solutions for homes and businesses.</p>
+    </div>
+
+    <!-- ============================================
+         INLINE RATE COMPARISON BANNER (NOW AT TOP)
+         ============================================ -->
+    <button class="consultation-link-banner" onclick="openConsultation()">
+        <span class="banner-title">🎁 Upload Your Plumber's List — Get FREE Rate Comparison!</span>
+        <span class="banner-subtitle">We'll compare rates, list tools & hardware, show brand-wise pricing, and help you save</span>
+        <span class="banner-arrow">→</span>
+    </button>
+
+    <!-- ============================================
+         RESIDENTIAL SERVICES
+         ============================================ -->
+    <div class="section-header">
+        <span class="section-icon">🏠</span>
+        <h2>Residential Services</h2>
+        <span class="section-tag">For Homes</span>
+    </div>
+
+    <div class="services-grid">
+
+        <!-- Card 1: Full House Plumbing -->
+        <div class="service-card-3d">
+            <div class="card-icon">🚰</div>
+            <h3>Full House Plumbing</h3>
+            <p>Complete plumbing solutions for your entire home — from pipes to taps, bathrooms to kitchen.</p>
+            <ul class="features">
+                <li>New pipe installation</li>
+                <li>Tap & fixture fitting</li>
+                <li>Drainage solutions</li>
+                <li>Bathroom & kitchen setup</li>
+            </ul>
+            <div class="price-tag">Starting ₹2,999 <small>(depends on size)</small></div>
+            <button onclick="sendServiceInquiry('Full House Plumbing', 2999)" class="btn-book">💬 Enquire on WhatsApp</button>
+        </div>
+
+        <!-- Card 2: Regular Checkups -->
+        <div class="service-card-3d">
+            <div class="card-icon">🔧</div>
+            <h3>Regular Checkups</h3>
+            <p>Preventive maintenance visits to catch issues early and keep your plumbing running smooth.</p>
+            <ul class="features">
+                <li>Monthly or quarterly visits</li>
+                <li>Full system inspection</li>
+                <li>Minor repairs included</li>
+                <li>Priority emergency support</li>
+            </ul>
+            <div class="price-tag">Starting ₹499 <small>/ month</small></div>
+            <button onclick="sendServiceInquiry('Regular Checkups', 499)" class="btn-book">💬 Enquire on WhatsApp</button>
+        </div>
+
+        <!-- Card 3: Water Tank Cleaning -->
+        <div class="service-card-3d">
+            <div class="card-icon">💧</div>
+            <h3>Water Tank Cleaning</h3>
+            <p>Professional cleaning and sanitization of your overhead and underground water tanks.</p>
+            <ul class="features">
+                <li>Complete draining</li>
+                <li>Deep cleaning & scrubbing</li>
+                <li>Anti-bacterial treatment</li>
+                <li>Safe refill</li>
+            </ul>
+            <div class="price-tag">Starting ₹799 <small>per tank</small></div>
+            <button onclick="sendServiceInquiry('Water Tank Cleaning', 799)" class="btn-book">💬 Enquire on WhatsApp</button>
+        </div>
+
+        <!-- Card 4: Custom Services -->
+        <div class="service-card-3d">
+            <div class="card-icon">✏️</div>
+            <h3>Custom Services</h3>
+            <p>Have a unique problem? Describe your issue and we'll provide a custom solution through WhatsApp.</p>
+            <textarea class="custom-input" placeholder="Describe your issue... (e.g., leaking tap, blocked drain)" rows="3"></textarea>
+            <button onclick="openCustomWhatsApp(this, 'Residential')" class="btn-book">💬 Get Quote</button>
+        </div>
+
+    </div>
+
+    <!-- ============================================
+         COMMERCIAL SERVICES
+         ============================================ -->
+    <div class="section-header commercial">
+        <span class="section-icon">🏢</span>
+        <h2>Commercial Services</h2>
+        <span class="section-tag">For Business</span>
+    </div>
+
+    <div class="services-grid">
+
+        <!-- Card 1: Hotel & Restaurant -->
+        <div class="service-card-3d commercial">
+            <div class="card-icon">🏨</div>
+            <h3>Hotel & Restaurant</h3>
+            <p>Bulk plumbing and maintenance for hospitality businesses with minimal downtime.</p>
+            <ul class="features">
+                <li>Kitchen plumbing setup</li>
+                <li>Bathroom maintenance</li>
+                <li>24/7 emergency support</li>
+                <li>Monthly contract available</li>
+            </ul>
+            <div class="price-tag">Custom Quote</div>
+            <button onclick="sendServiceInquiry('Hotel & Restaurant', 'Custom')" class="btn-book">💬 Enquire on WhatsApp</button>
+        </div>
+
+        <!-- Card 2: PG / Hostel -->
+        <div class="service-card-3d commercial">
+            <div class="card-icon">🏠</div>
+            <h3>PG / Hostel</h3>
+            <p>Multi-room plumbing solutions for paying guest accommodations and hostels.</p>
+            <ul class="features">
+                <li>Multiple room setup</li>
+                <li>Common bathroom care</li>
+                <li>Water supply management</li>
+                <li>Bulk repair packages</li>
+            </ul>
+            <div class="price-tag">Custom Quote</div>
+            <button onclick="sendServiceInquiry('PG / Hostel', 'Custom')" class="btn-book">💬 Enquire on WhatsApp</button>
+        </div>
+
+        <!-- Card 3: Shop & Office -->
+        <div class="service-card-3d commercial">
+            <div class="card-icon">🏢</div>
+            <h3>Shop & Office</h3>
+            <p>Professional plumbing and fixture services for commercial spaces and offices.</p>
+            <ul class="features">
+                <li>Fixture installation</li>
+                <li>Washroom maintenance</li>
+                <li>Small repair jobs</li>
+                <li>Regular servicing</li>
+            </ul>
+            <div class="price-tag">Starting ₹1,999</div>
+            <button onclick="sendServiceInquiry('Shop & Office', 1999)" class="btn-book">💬 Enquire on WhatsApp</button>
+        </div>
+
+        <!-- Card 4: Construction Projects -->
+        <div class="service-card-3d commercial">
+            <div class="card-icon">🏗️</div>
+            <h3>Construction Projects</h3>
+            <p>Bulk plumbing installation for new construction, renovations, and large projects.</p>
+            <ul class="features">
+                <li>Bulk material supply</li>
+                <li>Contractor rates</li>
+                <li>Site consultation</li>
+                <li>Timeline-based delivery</li>
+            </ul>
+            <div class="price-tag">Custom Quote</div>
+            <button onclick="sendServiceInquiry('Construction Projects', 'Custom')" class="btn-book">💬 Enquire on WhatsApp</button>
+        </div>
+
+        <!-- Card 5: Custom Commercial Project -->
+        <div class="service-card-3d commercial">
+            <div class="card-icon">✏️</div>
+            <h3>Custom Commercial Project</h3>
+            <p>Have a large-scale or unique commercial requirement? Tell us your needs and get a custom quote through WhatsApp.</p>
+            <textarea class="custom-input" placeholder="Describe your project... (e.g., New hotel plumbing, factory setup)" rows="3"></textarea>
+            <button onclick="openCustomWhatsApp(this, 'Commercial')" class="btn-book">💬 Get Custom Quote</button>
+        </div>
+
+    </div>
+
+    <!-- ============================================
+         BIG RATE COMPARISON SECTION
+         ============================================ -->
+    <div class="big-consultation-section">
+        <span class="big-badge">✨ 100% FREE ✨</span>
+        <h2>🎁 Free Rate Comparison</h2>
+        <p>
+            Show us your plumber's list and get a detailed comparison — we'll list tools, hardware, brand-wise pricing, 
+            and show you exactly how much you can save. No obligation!
+        </p>
+        <button onclick="openConsultation()" class="big-cta-btn">
+            <span>💬</span>
+            <span>Get Free Rate Comparison Now</span>
+        </button>
+        <div class="big-features">
+            <div class="big-feature">
+                <span class="check">✓</span>
+                <span>Upload Plumber's List</span>
+            </div>
+            <div class="big-feature">
+                <span class="check">✓</span>
+                <span>Rate Comparison</span>
+            </div>
+            <div class="big-feature">
+                <span class="check">✓</span>
+                <span>Tool & Hardware List</span>
+            </div>
+            <div class="big-feature">
+                <span class="check">✓</span>
+                <span>Brand-wise Pricing</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         SERVICES CTA
+         ============================================ -->
+    <div class="services-cta">
+        <h3>🎯 Not Sure Which Service You Need?</h3>
+        <p>Talk to our team — we'll help you choose the right service for your needs.</p>
+        <div class="cta-buttons">
+            <a href="https://wa.me/918176917033?text=Hi,%20I%20need%20help%20choosing%20a%20service" target="_blank" class="cta-btn cta-btn-primary">
+                💬 WhatsApp Us
+            </a>
+            <a href="tel:+919918582184" class="cta-btn cta-btn-secondary">
+                📞 Call Now
+            </a>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL: LOGIN REQUIRED
+         ============================================ -->
+    <div id="login-modal" class="modal-overlay-cons">
+        <div class="modal-box-cons">
+            <div class="modal-header-cons login">
+                <span class="icon">🔐</span>
+                <h3>Login Required</h3>
+            </div>
+            <div class="modal-body-cons">
+                <p>To submit your free rate comparison, please login first. This helps us:</p>
+                <ul class="check-list">
+                    <li>✅ Track your comparison request</li>
+                    <li>✅ Send you the report securely</li>
+                    <li>✅ Keep your history organized</li>
+                </ul>
+                <div class="modal-buttons-cons">
+                    <button onclick="goToLogin()" class="modal-btn-cons modal-btn-primary">
+                        🔐 Login Now
+                    </button>
+                    <button onclick="closeModal('login-modal')" class="modal-btn-cons modal-btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL: PROFILE INCOMPLETE
+         ============================================ -->
+    <div id="profile-modal" class="modal-overlay-cons">
+        <div class="modal-box-cons">
+            <div class="modal-header-cons profile">
+                <span class="icon">⚠️</span>
+                <h3>Complete Your Profile</h3>
+            </div>
+            <div class="modal-body-cons">
+                <p>We need a few details before you can submit your rate comparison:</p>
+                <ul id="profile-check-list" class="check-list">
+                    <!-- Dynamically filled by JS -->
+                </ul>
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <span>This helps us contact you and deliver your report properly.</span>
+                </div>
+                <div class="modal-buttons-cons">
+                    <button onclick="goToProfile()" class="modal-btn-cons modal-btn-primary">
+                        📝 Complete Profile
+                    </button>
+                    <button onclick="closeModal('profile-modal')" class="modal-btn-cons modal-btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL: RATE COMPARISON FORM
+         ============================================ -->
+    <div id="form-modal" class="modal-overlay-cons">
+        <div class="modal-box-cons">
+            <div class="modal-header-cons form">
+                <span class="icon">🎁</span>
+                <h3>Free Rate Comparison</h3>
+            </div>
+            <div class="modal-body-cons" id="form-modal-body">
+                <!-- Form will be injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL: SUCCESS (WITH SHARE ON WHATSAPP)
+         ============================================ -->
+    <div id="success-modal" class="modal-overlay-cons">
+        <div class="modal-box-cons">
+            <div class="modal-header-cons form">
+                <span class="icon">✅</span>
+                <h3>Submitted Successfully!</h3>
+            </div>
+            <div class="modal-body-cons">
+                <div class="success-screen">
+                    <div class="success-icon">🎉</div>
+                    <h2>Thank You!</h2>
+                    <p>Your rate comparison request has been received. Our team will review it and send you the report within 30 minutes to 1 hour.</p>
+                    
+                    <div class="reference-box">
+                        <div class="ref-label">Your Reference ID</div>
+                        <div class="ref-id" id="ref-id-display">CONSULT-XXXX</div>
+                        <div class="ref-hint">Save this ID to check your report status</div>
+                    </div>
+                    
+                    <div class="info-box" style="text-align:left;">
+                        <span class="info-icon">📱</span>
+                        <span><strong>Next step:</strong> Click the button below to share your slip on WhatsApp. This helps us process your comparison faster.</span>
+                    </div>
+                    
+                    <div class="modal-buttons-cons" style="margin-top:20px; flex-direction: column;">
+                        <a href="#" id="whatsapp-share-btn" target="_blank" class="modal-btn-cons modal-btn-whatsapp" style="width:100%;">
+                            📤 Share Slip on WhatsApp
+                        </a>
+                        <button onclick="closeModal('success-modal')" class="modal-btn-cons modal-btn-secondary" style="width:100%;">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>MD Enterprise</h3>
+                <p>Your trusted destination for professional hardware tools, home fixtures, industrial equipment, and premium paints.</p>
+                <p style="margin-top: 10px;">✉️ <a href="mailto:mauryahardware11@gmail.com">mauryahardware11@gmail.com</a></p>
+                <p>📞 <a href="tel:+919918582184">+91 99185-82184</a></p>
+            </div>
+            <div class="footer-col">
+                <h3>Store Address</h3>
+                <p>📍 Nagar Modd, Dewa Chinaht Road, Barethi, 225003</p>
+                <p>Barabanki, Uttar Pradesh</p>
+                <p style="margin-top: 10px;">💬 <a href="https://wa.me/919918582184?text=Hi%20Maurya%20Hardware,%20I%20found%20you%20on%20your%20website%20and%20want%20to%20know%20more." target="_blank">WhatsApp Us</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MD Enterprise. All Rights Reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- ============================================
+         FIREBASE + RATE COMPARISON SCRIPT (FIXED - FINAL)
+         ============================================ -->
+    <script type="module">
+        // ✅ 1. auth-global.js load होने का इंतज़ार करो
+        await new Promise(resolve => {
+            if (window.MDAuth) resolve();
+            else window.addEventListener('md-global-ready', resolve, { once: true });
+        });
+
+        // ✅ 2. अब user load होने का इंतज़ार करो (यह सबसे ज़रूरी है)
+        await window.MDWaitForUser();
+
+        // ✅ 3. Firebase modules import करो
+        import { 
+            ref, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            doc, 
+            getDoc, 
+            collection, 
+            addDoc,
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ✅ 4. Master से auth, db, storage लो
+        const auth = window.MDAuth;
+        const db = window.MDDB;
+        const storage = window.MDStorage;
+
+        // ✅ 5. अब user guaranteed loaded है — सीधे पकड़ो
+        let currentUser = auth.currentUser;
+        let currentUserData = window.MDUser.profile || {};
+        let selectedFile = null;
+
+        // ✅ 6. Backup — जब user logout/login करे तो data update रहे
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    currentUserData = userDoc.exists() ? userDoc.data() : {};
+                } catch (err) {
+                    console.error("Error loading user:", err);
+                    currentUserData = {};
+                }
+            } else {
+                currentUserData = null;
+            }
+        });
+
+        // ============================================
+        // OPEN RATE COMPARISON
+        // ============================================
+        window.openConsultation = function() {
+            if (!currentUser) {
+                openModal('login-modal');
+                return;
+            }
+
+            const data = currentUserData || {};
+            const missing = [];
+            if (!data.phone) missing.push('Phone Number');
+            if (!data.address) missing.push('Address');
+            if (!data.pincode) missing.push('Pincode');
+
+            if (missing.length > 0) {
+                const list = document.getElementById('profile-check-list');
+                list.innerHTML = '';
+
+                list.innerHTML += data.phone 
+                    ? `<li class="ok">✅ Phone: ${data.phone}</li>`
+                    : `<li class="missing">❌ Phone Number — Missing</li>`;
+
+                list.innerHTML += data.address
+                    ? `<li class="ok">✅ Address: Filled</li>`
+                    : `<li class="missing">❌ Address — Missing</li>`;
+
+                list.innerHTML += data.pincode
+                    ? `<li class="ok">✅ Pincode: ${data.pincode}</li>`
+                    : `<li class="missing">❌ Pincode — Missing</li>`;
+
+                openModal('profile-modal');
+                return;
+            }
+
+            renderConsultationForm();
+            openModal('form-modal');
+        };
+
+        // ============================================
+        // MODAL HELPERS
+        // ============================================
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.closeModal = function(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+
+            if (id === 'form-modal') {
+                selectedFile = null;
+            }
+        };
+
+        document.querySelectorAll('.modal-overlay-cons').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay-cons.active').forEach(m => {
+                    m.classList.remove('active');
+                });
+                document.body.style.overflow = '';
+            }
+        });
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        window.goToLogin = function() {
+            window.location.href = 'login.html?redirect=services.html';
+        };
+
+        window.goToProfile = function() {
+            window.location.href = 'login.html?redirect=services.html&tab=profile';
+        };
+
+        // ============================================
+        // RENDER RATE COMPARISON FORM
+        // ============================================
+        function renderConsultationForm() {
+            const data = currentUserData || {};
+            const body = document.getElementById('form-modal-body');
+            body.innerHTML = `
+                <p>Please provide the following details so we can compare rates on your plumber's list:</p>
+
+                <div class="form-group-cons">
+                    <label>Your Name</label>
+                    <input type="text" class="form-input-cons" id="cons-name" 
+                           value="${data.fullName || ''}" readonly>
+                </div>
+
+                <div class="form-group-cons">
+                    <label>Phone (WhatsApp)</label>
+                    <input type="tel" class="form-input-cons" id="cons-phone" 
+                           value="${data.phone || ''}" readonly>
+                </div>
+
+                <div class="form-group-cons">
+                    <label>Service Address</label>
+                    <input type="text" class="form-input-cons" id="cons-address" 
+                           value="${data.address || ''}${data.city ? ', ' + data.city : ''}${data.pincode ? ' - ' + data.pincode : ''}" readonly>
+                </div>
+
+                <div class="form-group-cons">
+                    <label>Problem Description <span class="required">*</span></label>
+                    <textarea class="form-input-cons" id="cons-problem" 
+                              placeholder="Describe what needs to be done (e.g., leaking tap in bathroom, pipes replaced in kitchen)" 
+                              rows="3" required></textarea>
+                </div>
+
+                <div class="form-group-cons">
+                    <label>Upload Plumber's List / Slip <span class="required">*</span></label>
+                    <div class="file-upload-box" id="file-upload-box" onclick="document.getElementById('cons-file').click()">
+                        <div class="upload-icon">📎</div>
+                        <div class="upload-title">Click to upload your plumber's list</div>
+                        <div class="upload-hint">JPG, PNG, or PDF (Max 10MB)</div>
+                    </div>
+                    <input type="file" id="cons-file" accept="image/*,.pdf" 
+                           style="display:none;" onchange="handleFileSelect(event)">
+                    <div id="file-preview" style="display:none;"></div>
+                </div>
+
+                <div class="info-box">
+                    <span class="info-icon">⏱️</span>
+                    <span>Our team will review your list and send the rate comparison within <strong>30 min - 1 hour</strong>.</span>
+                </div>
+
+                <p id="cons-error" style="color:#dc2626; font-size:0.85rem; display:none;"></p>
+
+                <div class="modal-buttons-cons">
+                    <button id="submit-cons-btn" onclick="submitConsultation()" class="modal-btn-cons modal-btn-primary">
+                        🚀 Submit for Comparison
+                    </button>
+                    <button onclick="closeModal('form-modal')" class="modal-btn-cons modal-btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            `;
+
+            selectedFile = null;
+        }
+
+        // ============================================
+        // FILE HANDLING
+        // ============================================
+        window.handleFileSelect = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert("❌ File is too large. Maximum 10MB allowed.");
+                event.target.value = '';
+                return;
+            }
+
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'application/pdf'];
+            if (!validTypes.includes(file.type)) {
+                alert("❌ Only JPG, PNG, or PDF files are allowed.");
+                event.target.value = '';
+                return;
+            }
+
+            selectedFile = file;
+            showFilePreview(file);
+        };
+
+        function showFilePreview(file) {
+            const preview = document.getElementById('file-preview');
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            
+            preview.style.display = 'flex';
+            preview.className = 'file-preview';
+            preview.innerHTML = `
+                <span style="font-size:1.2rem;">${file.type === 'application/pdf' ? '📄' : '🖼️'}</span>
+                <span class="file-name">${file.name} (${sizeMB} MB)</span>
+                <button class="file-remove" onclick="removeFile()">×</button>
+            `;
+        }
+
+        window.removeFile = function() {
+            selectedFile = null;
+            document.getElementById('cons-file').value = '';
+            document.getElementById('file-preview').style.display = 'none';
+        };
+
+        // ============================================
+        // SUBMIT RATE COMPARISON
+        // ============================================
+        window.submitConsultation = async function() {
+            const problem = document.getElementById('cons-problem').value.trim();
+            const errorEl = document.getElementById('cons-error');
+            const submitBtn = document.getElementById('submit-cons-btn');
+            const data = currentUserData || {};
+
+            errorEl.style.display = 'none';
+
+            if (!problem) {
+                errorEl.textContent = "❌ Please describe your problem.";
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (!selectedFile) {
+                errorEl.textContent = "❌ Please upload your plumber's list.";
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "⏳ Submitting...";
+
+            try {
+                const refId = 'CONSULT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                let fileUrl = '';
+
+                // Storage upload (graceful fallback — अगर fail हो तो डेटा फिर भी save हो)
+                try {
+                    const storageRef = ref(storage, 'consultations/' + Date.now() + '_' + selectedFile.name);
+                    const snapshot = await uploadBytes(storageRef, selectedFile);
+                    fileUrl = await getDownloadURL(snapshot.ref);
+                } catch (storageErr) {
+                    console.warn("Storage upload failed, saving without file:", storageErr);
+                    fileUrl = '';
+                }
+
+                // Firestore save
+                await addDoc(collection(db, "consultations"), {
+                    userId: currentUser.uid,
+                    fullName: data.fullName || '',
+                    phone: data.phone || '',
+                    email: data.email || currentUser.email,
+                    address: data.address || '',
+                    city: data.city || '',
+                    pincode: data.pincode || '',
+                    problemDescription: problem,
+                    fileName: selectedFile.name,
+                    fileSize: selectedFile.size,
+                    fileType: selectedFile.type,
+                    fileUrl: fileUrl,
+                    referenceId: refId,
+                    status: 'pending',
+                    submittedAt: serverTimestamp(),
+                    reviewedAt: null,
+                    adminResponse: null,
+                    reportUrl: null
+                });
+
+                console.log("✅ Rate comparison submitted:", refId);
+                showSuccess(refId, problem);
+
+            } catch (err) {
+                console.error("Submit error:", err);
+                errorEl.textContent = "❌ " + (err.message || "Failed to submit. Please try again.");
+                errorEl.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = "🚀 Submit for Comparison";
+            }
+        };
+
+        // ============================================
+        // SHOW SUCCESS (WITH SHARE ON WHATSAPP)
+        // ============================================
+        function showSuccess(refId, problem) {
+            closeModal('form-modal');
+            document.getElementById('ref-id-display').textContent = refId;
+
+            const data = currentUserData || {};
+
+            const waMsg = encodeURIComponent(
+                `Hi MD Enterprise,\n\nI have submitted a Free Rate Comparison request.\n\n` +
+                `Reference ID: ${refId}\n` +
+                `Name: ${data.fullName || ''}\n` +
+                `Phone: ${data.phone || ''}\n` +
+                `Problem: ${problem.substring(0, 150)}${problem.length > 150 ? '...' : ''}\n\n` +
+                `I am also sharing my plumber's slip/list on WhatsApp now.\n\n` +
+                `Please compare the rates and send me the report within 30 min - 1 hour.`
+            );
+
+            // ✅ Share on WhatsApp — 8176917033
+            document.getElementById('whatsapp-share-btn').href = 
+                `https://wa.me/918176917033?text=${waMsg}`;
+
+            openModal('success-modal');
+        }
+
+        // ============================================
+        // CUSTOM WHATSAPP (for service cards)
+        // ============================================
+        window.openCustomWhatsApp = function(button, category) {
+            const textarea = button.previousElementSibling;
+            const text = textarea ? textarea.value.trim() : '';
+            
+            if (!text) {
+                alert("⚠️ Please describe your issue first.");
+                if (textarea) textarea.focus();
+                return;
+            }
+
+            const tag = category ? `[${category}]\n` : '';
+            const msg = encodeURIComponent(`Hi MD Enterprise,\n\n${tag}I have a custom service request:\n\n${text}`);
+            window.open(`https://wa.me/918176917033?text=${msg}`, '_blank');
+
+            if (textarea) textarea.value = '';
+        };
+
+        // ============================================
+        // WHATSAPP SERVICE INQUIRY (For Fixed Services)
+        // ============================================
+        window.sendServiceInquiry = function(serviceName, amount) {
+            let userName = "";
+            if (currentUser && currentUserData.fullName) {
+                userName = `My name is ${currentUserData.fullName}. `;
+            }
+
+            let priceText = amount === 'Custom' ? 'Custom Quote' : `Starting at ₹${amount}`;
+            const message = `Hi MD Enterprise,\n\n${userName}I am interested in the "${serviceName}" service (${priceText}).\n\nPlease share more details and the booking process.`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappNumber = "918176917033"; // आपका नया WhatsApp नंबर
+            
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+        };
+    </script>
+</body>
+</html>

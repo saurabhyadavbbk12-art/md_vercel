@@ -1,0 +1,9 @@
+{
+  "name": "md-enterprise",
+  "version": "1.0.0",
+  "description": "MD Enterprise Website",
+  "main": "index.html",
+  "dependencies": {
+    "razorpay": "^2.9.4"
+  }
+}

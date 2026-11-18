@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="manifest" href="/manifest.json">
+    <script type="module" src="auth-global.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - MD Enterprise</title>
+    
+    <link rel="stylesheet" href="desktop.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        .cart-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: flex; gap: 30px; flex-wrap: wrap; }
+        .cart-items-section { flex: 2; min-width: 300px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); }
+        .cart-summary-section { flex: 1; min-width: 280px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); height: fit-content; }
+        .cart-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .cart-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
+        .cart-item-details { flex: 1; }
+        .cart-item-title { font-weight: 700; color: var(--text-dark); font-size: 1rem; }
+        .cart-item-price { color: var(--primary-purple); font-weight: 800; margin-top: 4px; }
+        .qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+        .qty-btn { background: #e0e0e0; border: none; width: 28px; height: 28px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .qty-input { width: 40px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 4px; }
+        .remove-btn { color: #dc2626; background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-left: auto; }
+        .empty-cart-msg { text-align: center; padding: 50px 20px; }
+        .empty-cart-msg i { font-size: 4rem; color: #ccc; margin-bottom: 20px; }
+        .empty-cart-msg h3 { color: #555; margin-bottom: 15px; }
+        .empty-cart-msg a { display: inline-block; background: var(--primary-purple); color: #fff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1rem; color: #555; }
+        .summary-row.total { font-weight: 800; font-size: 1.2rem; color: var(--text-dark); border-top: 2px solid #eee; padding-top: 15px; margin-top: 15px; }
+        .checkout-btn { width: 100%; background: var(--primary-purple); color: #fff; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        .checkout-btn:hover { background: var(--purple-hover); }
+        .address-box { background: #f9fbf8; border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .address-box h4 { margin-bottom: 10px; color: var(--text-dark); font-size: 0.9rem; }
+        .address-input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+        .heavy-item-warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #92400e; margin-bottom: 15px; display: none; }
+        @media (max-width: 768px) { .cart-container { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+    <header class="standalone-solid-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="store.html" style="color: #fff; text-decoration: none; font-size: 1.5rem; padding-right: 5px;">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="logo-container">
+                <img src="images/maurya_logo.png" alt="MD Enterprise">
+                <h1>MD Enterprise</h1>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="store.html">Store</a></li>
+                <li><a href="login.html" id="nav-login-link">👤</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="cart-container">
+        <div class="cart-items-section" id="cart-items-container">
+            <h2 style="margin-bottom: 20px; color: var(--primary-purple);">Your Cart</h2>
+            <div id="cart-list">
+                <p style="text-align: center; color: #666;">Loading your cart...</p>
+            </div>
+        </div>
+
+        <div class="cart-summary-section">
+            <h3 style="margin-bottom: 20px; color: var(--text-dark);">Order Summary</h3>
+            
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal-amount">₹0</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery Charge</span>
+                <span id="delivery-charge">₹0</span>
+            </div>
+            
+            <div class="summary-row total">
+                <span>Total</span>
+                <span id="total-amount">₹0</span>
+            </div>
+
+            <div class="heavy-item-warning" id="heavy-warning">
+                ⚠️ आपके कार्ट में भारी सामान है। डिलीवरी चार्ज और जानकारी के लिए कृपया WhatsApp पर संपर्क करें।
+            </div>
+
+            <div id="delivery-section" style="display: none;">
+                <div class="address-box">
+                    <h4>📍 Delivery Address</h4>
+                    <select class="address-input" id="address-type">
+                        <option value="saved">Deliver to my saved address</option>
+                        <option value="new">Deliver to a different address (Gift/Other)</option>
+                    </select>
+                    
+                    <div id="new-address-form" style="display: none;">
+                        <input type="text" id="new-name" class="address-input" placeholder="Recipient Name">
+                        <input type="text" id="new-phone" class="address-input" placeholder="Recipient Phone">
+                        <input type="text" id="new-address" class="address-input" placeholder="Full Address">
+                        <input type="text" id="new-city" class="address-input" placeholder="City (Barabanki/Lucknow)" value="Barabanki">
+                        <input type="text" id="new-pincode" class="address-input" placeholder="Pincode (6 digits)">
+                    </div>
+                </div>
+            </div>
+
+            <button class="checkout-btn" id="checkout-btn">Proceed to Pay</button>
+            
+            <div id="whatsapp-heavy-btn" style="display: none; text-align: center; margin-top: 15px;">
+                <a href="https://wa.me/918176917033?text=Hi,%20I%20want%20to%20order%20heavy%20items%20from%20your%20store." target="_blank" style="background: #25d366; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
+                    💬 Contact on WhatsApp for Heavy Items
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbzGwlweGrzwTi3CCH-oj8ATzBpVK19WfPPxgcL7QokH78OUV8DAMg1XRzmMc2OGbe3_WQ/exec'; // ⚠️ अपना Google Sheet API URL यहाँ डालें
+
+        await new Promise(resolve => {
+            if (window.MDAuth) resolve();
+            else window.addEventListener('md-global-ready', resolve, { once: true });
+        });
+        await window.MDWaitForUser();
+
+        const auth = window.MDAuth;
+        const db = window.MDDB;
+        let currentUser = auth.currentUser;
+        let currentUserData = window.MDUser.profile || {};
+        let cartItems = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    currentUserData = userDoc.exists() ? userDoc.data() : {};
+                } catch (err) { console.error(err); }
+                loadCart();
+            } else {
+                loadCart();
+            }
+        });
+
+        async function loadCart() {
+            if (!currentUser) {
+                document.getElementById('cart-list').innerHTML = `
+                    <div class="empty-cart-msg">
+                        <i class="fa-solid fa-lock"></i>
+                        <h3>Please Login to view cart</h3>
+                        <a href="login.html">Login Now</a>
+                    </div>`;
+                return;
+            }
+
+            try {
+                const cartRef = collection(db, "users", currentUser.uid, "cart");
+                const snapshot = await getDocs(cartRef);
+                cartItems = [];
+                snapshot.forEach(docSnap => {
+                    cartItems.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                if (cartItems.length === 0) {
+                    document.getElementById('cart-list').innerHTML = `
+                        <div class="empty-cart-msg">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <h3>Your Cart is Empty</h3>
+                            <p style="color:#888; margin-bottom:15px;">Go to store and add some items.</p>
+                            <a href="store.html">Go to Store</a>
+                        </div>`;
+                    document.getElementById('checkout-btn').style.display = 'none';
+                    document.getElementById('delivery-section').style.display = 'none';
+                } else {
+                    renderCart();
+                }
+            } catch (err) {
+                console.error("Cart error:", err);
+            }
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-list');
+            list.innerHTML = '';
+            
+            cartItems.forEach(item => {
+                list.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.imageUrl || 'https://via.placeholder.com/70'}" alt="${item.title}">
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">${item.title}</div>
+                            <div class="cart-item-price">₹${item.price}</div>
+                            <div class="qty-controls">
+                                <button class="qty-btn dec-qty" data-id="${item.id}">-</button>
+                                <input type="text" class="qty-input" value="${item.qty}" readonly>
+                                <button class="qty-btn inc-qty" data-id="${item.id}">+</button>
+                            </div>
+                        </div>
+                        <button class="remove-btn remove-item-btn" data-id="${item.id}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+            calculateTotals();
+        }
+
+        // Cart Actions Event Listener (Module Scope Fix)
+        document.getElementById('cart-list').addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            const id = target.getAttribute('data-id');
+            if (target.classList.contains('inc-qty')) updateQty(id, 1);
+            if (target.classList.contains('dec-qty')) updateQty(id, -1);
+            if (target.classList.contains('remove-item-btn')) removeItem(id);
+        });
+
+        async function updateQty(id, change) {
+            const item = cartItems.find(i => i.id === id);
+            if (!item) return;
+            
+            const newQty = item.qty + change;
+            if (newQty <= 0) {
+                removeItem(id);
+                return;
+            }
+            
+            const cartItemRef = doc(db, "users", currentUser.uid, "cart", id);
+            await updateDoc(cartItemRef, { qty: newQty });
+            item.qty = newQty;
+            renderCart();
+        }
+
+        async function removeItem(id) {
+            const cartItemRef = doc(db, "users", currentUser.uid, "cart", id);
+            await deleteDoc(cartItemRef);
+            cartItems = cartItems.filter(i => i.id !== id);
+            if (cartItems.length === 0) loadCart(); else renderCart();
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            let hasHeavyItem = false;
+
+            cartItems.forEach(item => {
+                subtotal += item.price * item.qty;
+                if (item.is_heavy === 'YES' || item.is_heavy === 'yes') {
+                    hasHeavyItem = true;
+                }
+            });
+
+            let deliveryCharge = (subtotal >= 4000 && !hasHeavyItem) ? 0 : 50;
+
+            document.getElementById('subtotal-amount').textContent = `₹${subtotal}`;
+            document.getElementById('delivery-charge').textContent = `₹${deliveryCharge}`;
+            document.getElementById('total-amount').textContent = `₹${subtotal + deliveryCharge}`;
+
+            if (hasHeavyItem) {
+                document.getElementById('heavy-warning').style.display = 'block';
+                document.getElementById('checkout-btn').style.display = 'none';
+                document.getElementById('whatsapp-heavy-btn').style.display = 'block';
+            } else {
+                document.getElementById('heavy-warning').style.display = 'none';
+                document.getElementById('checkout-btn').style.display = 'block';
+                document.getElementById('whatsapp-heavy-btn').style.display = 'none';
+            }
+
+            document.getElementById('delivery-section').style.display = 'block';
+        }
+
+        document.getElementById('address-type').addEventListener('change', (e) => {
+            document.getElementById('new-address-form').style.display = e.target.value === 'new' ? 'block' : 'none';
+        });
+
+        document.getElementById('checkout-btn').addEventListener('click', async () => {
+            if (!currentUser) return;
+
+            const addressType = document.getElementById('address-type').value;
+            let deliveryDetails = {};
+
+            if (addressType === 'saved') {
+                if (!currentUserData.address || !currentUserData.phone) {
+                    alert("आपकी प्रोफाइल में पता या फोन नंबर नहीं है। कृपया पहले प्रोफाइल अपडेट करें।");
+                    window.location.href = 'login.html';
+                    return;
+                }
+                deliveryDetails = {
+                    name: currentUserData.fullName || 'Customer',
+                    phone: currentUserData.phone,
+                    address: currentUserData.address + ', ' + (currentUserData.city || ''),
+                    city: currentUserData.city || 'Barabanki',
+                    pincode: currentUserData.pincode
+                };
+            } else {
+                const name = document.getElementById('new-name').value.trim();
+                const phone = document.getElementById('new-phone').value.trim();
+                const address = document.getElementById('new-address').value.trim();
+                const city = document.getElementById('new-city').value.trim();
+                const pincode = document.getElementById('new-pincode').value.trim();
+
+                if (!name || !phone || !address || !city || !pincode) {
+                    alert("कृपया डिलीवरी के सभी फील्ड भरें।");
+                    return;
+                }
+                deliveryDetails = { name, phone, address, city, pincode };
+            }
+
+            const totalText = document.getElementById('total-amount').textContent.replace('₹', '');
+            const finalAmount = parseFloat(totalText);
+
+            try {
+                const response = await fetch('/api/create-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount: finalAmount, currency: "INR" })
+});
+
+if (!response.ok) {
+    throw new Error("Order creation failed");
+}
+const order = await response.json();
+
+const options = {
+    key: "rzp_test_U1ZvGyuSm4AOSN", // ✅ आपकी असली टेस्ट की
+                    amount: order.amount,
+                    currency: order.currency,
+                    name: "MD Enterprise",
+                    description: "Store Purchase",
+                    order_id: order.id,
+                    handler: async function (response) {
+                        alert("Payment Successful! ID: " + response.razorpay_payment_id);
+                        window.location.href = "payment-success.html";
+                    },
+                    prefill: {
+                        name: deliveryDetails.name,
+                        contact: deliveryDetails.phone
+                    },
+                    notes: {
+                        userId: currentUser.uid,
+                        deliveryName: deliveryDetails.name,
+                        deliveryPhone: deliveryDetails.phone,
+                        deliveryAddress: deliveryDetails.address,
+                        deliveryCity: deliveryDetails.city,
+                        deliveryPincode: deliveryDetails.pincode,
+                        items: JSON.stringify(cartItems),
+                        type: "store"
+                    },
+                    theme: { color: "#5e2b97" }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (err) {
+                console.error("Payment error:", err);
+                alert("पेमेंट शुरू नहीं हो पाया। कृपया दोबारा प्रयास करें।");
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <!-- ✅ नई line: auth-global.js पहले load हो -->
+    <script type="module" src="auth-global.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - M D Enterprise</title>
+    
+    <link rel="stylesheet" href="desktop.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; min-height: 100vh; }
+
+        /* ============================================
+           LOGIN SCREEN
+           ============================================ */
+        #admin-login-screen {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0b132b, #1c2541);
+            padding: 20px;
+        }
+
+        .admin-login-box {
+            background: #fff;
+            padding: 40px 35px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .admin-login-box .icon { font-size: 3.5rem; margin-bottom: 15px; }
+        .admin-login-box h1 { color: #0b132b; font-size: 1.6rem; margin-bottom: 8px; }
+        .admin-login-box p { color: #666; font-size: 0.9rem; margin-bottom: 25px; }
+
+        .admin-login-box input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .admin-login-box input:focus { outline: none; border-color: #0b132b; }
+
+        .admin-login-box button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0b132b, #1c2541);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .admin-login-box button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .admin-error {
+            color: #d9534f;
+            background: #fde8e8;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            border: 1px solid #f8b4b4;
+            text-align: left;
+        }
+
+        .admin-success {
+            color: #2e7d32;
+            background: #edf7ed;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            border: 1px solid #c8e6c9;
+            text-align: left;
+        }
+
+        .forgot-btn {
+            background: none;
+            border: none;
+            color: #0b132b;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: underline;
+            font-family: inherit;
+        }
+
+        /* ============================================
+           DASHBOARD
+           ============================================ */
+        #admin-dashboard { display: none; }
+
+        .admin-header {
+            background: linear-gradient(135deg, #0b132b, #1c2541);
+            color: #fff;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .admin-header h1 { font-size: 1.3rem; }
+        .admin-header .admin-user { font-size: 0.85rem; display: flex; align-items: center; gap: 15px; }
+
+        .admin-header .logout-btn {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+        /* ============================================
+           STATS CARDS
+           ============================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border-left: 5px solid #0b132b;
+        }
+
+        .stat-card .stat-icon { font-size: 1.8rem; margin-bottom: 6px; }
+        .stat-card .stat-number { font-size: 1.8rem; font-weight: 800; color: #0b132b; }
+        .stat-card .stat-label { color: #666; font-size: 0.85rem; margin-top: 4px; }
+        .stat-card.warning { border-left-color: #ff9800; }
+        .stat-card.warning .stat-number { color: #ff9800; }
+        .stat-card.success { border-left-color: #2e7d32; }
+        .stat-card.success .stat-number { color: #2e7d32; }
+        .stat-card.danger { border-left-color: #d9534f; }
+        .stat-card.danger .stat-number { color: #d9534f; }
+
+        /* ============================================
+           TABS
+           ============================================ */
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            background: #fff;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #666;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .admin-tab.active { background: linear-gradient(135deg, #0b132b, #1c2541); color: #fff; }
+
+        /* ============================================
+           SEARCH BAR
+           ============================================ */
+        .admin-search-bar {
+            background: #fff;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .admin-search-bar input, .admin-search-bar select {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .admin-search-bar input { flex: 1; min-width: 200px; }
+
+        #type-filter {
+            font-weight: 700;
+            color: #0b132b;
+            background: #f4f6f8;
+        }
+
+        .action-btn {
+            padding: 12px 20px;
+            background: #0b132b;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .export-btn { background: #2e7d32; }
+
+        /* ============================================
+           TABLES
+           ============================================ */
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .table-responsive { overflow-x: auto; }
+
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .admin-table thead { background: #f4f6f8; border-bottom: 2px solid #e0e0e0; }
+        .admin-table th { padding: 14px 16px; text-align: left; font-weight: 700; color: #0b132b; font-size: 0.8rem; text-transform: uppercase; }
+        .admin-table td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; color: #333; }
+        .admin-table tbody tr:hover { background: #fafbfc; }
+
+        .view-btn {
+            padding: 6px 14px;
+            background: #0b132b;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+        .badge-active { background: #e6f4ea; color: #137333; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-expired { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+        .badge-service { background: #f3e8ff; color: #6b21a8; }
+        .badge-consult { background: #fef3c7; color: #92400e; }
+
+        .whatsapp-small {
+            background: #25d366;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state .icon { font-size: 3.5rem; margin-bottom: 10px; }
+
+        .loading-state { text-align: center; padding: 60px 20px; color: #666; }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #0b132b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .datetime-cell {
+            font-size: 0.8rem;
+            color: #555;
+            line-height: 1.4;
+        }
+        .datetime-cell .date-part {
+            font-weight: 700;
+            color: #0b132b;
+        }
+        .datetime-cell .time-part {
+            color: #666;
+            font-size: 0.75rem;
+        }
+
+        /* ============================================
+           USER HISTORY MODAL (FULL RECORD)
+           ============================================ */
+        .history-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .history-modal-overlay.active { display: flex; }
+
+        .history-modal-box {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 850px;
+            max-height: 92vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .history-modal-header {
+            background: linear-gradient(135deg, #0b132b, #1c2541);
+            color: #fff;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .history-modal-header h3 { font-size: 1.1rem; }
+
+        .history-close-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-family: inherit;
+        }
+
+        .history-modal-body { padding: 25px; }
+
+        .user-info-section { background: #f4f6f8; padding: 18px; border-radius: 10px; margin-bottom: 20px; }
+        .user-info-section h4 { color: #0b132b; font-size: 0.95rem; margin-bottom: 12px; text-transform: uppercase; }
+
+        .user-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .user-info-item { display: flex; gap: 8px; font-size: 0.9rem; flex-wrap: wrap; }
+        .user-info-item .label { color: #666; font-weight: 600; }
+
+        .user-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+
+        .user-stat-card {
+            background: linear-gradient(135deg, #0b132b, #1c2541);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .user-stat-card .value { font-size: 1.5rem; font-weight: 800; }
+        .user-stat-card .label { font-size: 0.75rem; opacity: 0.85; margin-top: 4px; }
+
+        .history-section { margin-bottom: 25px; }
+        .history-section h4 { 
+            color: #0b132b; 
+            font-size: 0.95rem; 
+            margin-bottom: 12px; 
+            padding-bottom: 8px; 
+            border-bottom: 2px solid #f0f0f0; 
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: #fafbfc;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .history-item .info { flex: 1; min-width: 200px; }
+        .history-item .title { font-weight: 700; color: #0b132b; font-size: 0.9rem; margin-bottom: 4px; }
+        .history-item .details { font-size: 0.8rem; color: #666; line-height: 1.5; }
+        .history-item .amount { font-weight: 800; color: #2e7d32; font-size: 1rem; }
+        .history-item .date { font-size: 0.75rem; color: #999; margin-top: 4px; }
+
+        .no-history { 
+            text-align: center; 
+            padding: 20px; 
+            color: #999; 
+            font-size: 0.85rem; 
+            background: #fafbfc; 
+            border-radius: 8px;
+            border: 1px dashed #e0e0e0;
+        }
+
+        .service-status-pending { color: #92400e; font-weight: 700; }
+        .service-status-done { color: #137333; font-weight: 700; }
+
+        /* ============================================
+           MOBILE-FRIENDLY CARD VIEW
+           ============================================ */
+        @media (max-width: 768px) {
+            .admin-header { padding: 12px 14px; }
+            .admin-header h1 { font-size: 1rem; }
+            .admin-header .admin-user { font-size: 0.75rem; gap: 8px; }
+            .admin-header .logout-btn { padding: 6px 12px; font-size: 0.72rem; }
+
+            .admin-container { padding: 15px 10px; }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                margin-bottom: 16px;
+            }
+
+            .stat-card { padding: 14px; }
+            .stat-card .stat-icon { font-size: 1.3rem; }
+            .stat-card .stat-number { font-size: 1.3rem; }
+            .stat-card .stat-label { font-size: 0.7rem; }
+
+            .admin-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding: 6px;
+                gap: 6px;
+                scrollbar-width: none;
+                margin-bottom: 15px;
+            }
+
+            .admin-tabs::-webkit-scrollbar { display: none; }
+
+            .admin-tab {
+                flex: 0 0 auto;
+                min-width: auto;
+                padding: 10px 14px;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+
+            .admin-search-bar {
+                flex-direction: column;
+                padding: 12px;
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .admin-search-bar input,
+            .admin-search-bar select,
+            .admin-search-bar button {
+                width: 100%;
+                font-size: 0.85rem;
+                padding: 10px 12px;
+            }
+
+            .table-container { background: transparent; box-shadow: none; }
+            .admin-table thead { display: none !important; }
+            .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+
+            .admin-table tbody tr {
+                background: #fff;
+                border: 1px solid #e0e0e0;
+                border-radius: 12px;
+                margin-bottom: 12px;
+                padding: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                display: block;
+            }
+
+            .admin-table tbody td {
+                border: none;
+                padding: 6px 0;
+                font-size: 0.85rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                gap: 10px;
+            }
+
+            .admin-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: #666;
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                text-align: left;
+                flex: 0 0 auto;
+                letter-spacing: 0.3px;
+            }
+
+            .admin-table tbody td:first-child { display: none; }
+
+            .admin-table tbody td:nth-child(2) {
+                display: block;
+                border-bottom: 1px solid #f0f0f0;
+                padding: 0 0 10px 0;
+                margin-bottom: 10px;
+                text-align: left;
+                font-size: 1rem;
+                color: #0b132b;
+                font-weight: 700;
+            }
+
+            .admin-table tbody td:nth-child(2)::before { display: none; }
+
+            .admin-table tbody td:last-child {
+                display: flex;
+                gap: 8px;
+                padding-top: 12px;
+                border-top: 1px solid #f0f0f0;
+                margin-top: 10px;
+                text-align: left;
+            }
+
+            .admin-table tbody td:last-child::before { display: none; }
+
+            .admin-table tbody td:last-child .view-btn { flex: 1; padding: 10px; font-size: 0.8rem; }
+            .admin-table tbody td:last-child .whatsapp-small { padding: 10px 14px; font-size: 0.8rem; }
+            .admin-table tbody tr:hover { background: #fff; }
+
+            .history-modal-box { max-width: 100%; max-height: 95vh; border-radius: 12px; }
+            .history-modal-header { padding: 16px 18px; border-radius: 12px 12px 0 0; }
+            .history-modal-header h3 { font-size: 1rem; }
+            .history-modal-body { padding: 18px; }
+            .user-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .history-item { flex-direction: column; gap: 6px; }
+            .user-info-item { font-size: 0.85rem; }
+        }
+
+        @media (max-width: 400px) {
+            .admin-header h1 { font-size: 0.9rem; }
+            .stat-card .stat-number { font-size: 1.1rem; }
+            .admin-tab { padding: 8px 12px; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================
+         LOGIN SCREEN
+         ============================================ -->
+    <div id="admin-login-screen">
+        <div class="admin-login-box">
+            <div class="icon">🔐</div>
+            <h1>Admin Panel</h1>
+            <p>M D Enterprise — Secure Admin Access</p>
+            
+            <p id="login-error" class="admin-error" style="display: none;"></p>
+            <p id="login-success" class="admin-success" style="display: none;"></p>
+            
+            <form id="admin-login-form">
+                <input type="email" id="admin-email" placeholder="Admin Email" required autocomplete="email">
+                <input type="password" id="admin-password" placeholder="Password" required autocomplete="current-password">
+                
+                <div style="text-align: right; margin-bottom: 15px;">
+                    <button type="button" id="forgot-password-btn" class="forgot-btn">
+                        Forgot Password?
+                    </button>
+                </div>
+                
+                <button type="submit" id="login-btn">🔓 Login to Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
+         DASHBOARD
+         ============================================ -->
+    <div id="admin-dashboard">
+        <div class="admin-header">
+            <h1>⚙️ Admin Dashboard</h1>
+            <div class="admin-user">
+                <span id="admin-name-display">Admin</span>
+                <button class="logout-btn" id="admin-logout-btn">🚪 Logout</button>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number" id="stat-total-users">0</div>
+                    <div class="stat-label">Total Members</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="stat-active-plans">0</div>
+                    <div class="stat-label">Active Packages</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-number" id="stat-expiring-soon">0</div>
+                    <div class="stat-label">Expiring Soon</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-number" id="stat-expired">0</div>
+                    <div class="stat-label">Expired Packages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🛒</div>
+                    <div class="stat-number" id="stat-total-orders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="members">👥 Members</button>
+                <button class="admin-tab" data-tab="plans">📦 Packages</button>
+                <button class="admin-tab" data-tab="services">🛠️ Services</button>
+                <button class="admin-tab" data-tab="orders">🛒 Orders</button>
+                <button class="admin-tab" data-tab="consultations">📋 Consultations</button>
+                <button class="admin-tab" data-tab="expiring">⏰ Expiring</button>
+            </div>
+
+            <!-- Search Bar with Type Filter -->
+            <div class="admin-search-bar">
+                <input type="text" id="search-input" placeholder="🔍 Search by name, phone, email, or reference ID...">
+                <select id="type-filter">
+                    <option value="all">All Types</option>
+                    <option value="members">Only Members</option>
+                    <option value="plans">Only Packages</option>
+                    <option value="services">Only Services</option>
+                    <option value="consultations">Only Consultations</option>
+                </select>
+                <select id="filter-select">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="expiring">Expiring</option>
+                    <option value="expired">Expired</option>
+                </select>
+                <button id="refresh-btn" class="action-btn">🔄 Refresh</button>
+                <button id="export-btn" class="action-btn export-btn">📥 Export CSV</button>
+            </div>
+
+            <!-- Members Tab -->
+            <div id="tab-members" class="tab-content active">
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>City</th>
+                                    <th>Joined (Date & Time)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="members-table-body">
+                                <tr><td colspan="7"><div class="loading-state"><div class="loading-spinner"></div>Loading members...</div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Packages Tab -->
+            <div id="tab-plans" class="tab-content">
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Package</th>
+                                    <th>Price</th>
+                                    <th>Purchased (Date & Time)</th>
+                                    <th>Expiry</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="plans-table-body">
+                                <tr><td colspan="8"><div class="loading-state"><div class="loading-spinner"></div>Loading packages...</div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Tab -->
+            <div id="tab-services" class="tab-content">
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Service Type</th>
+                                    <th>Category</th>
+                                    <th>Booked (Date & Time)</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="services-table-body">
+                                <tr><td colspan="8"><div class="loading-state"><div class="loading-spinner"></div>Loading services...</div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="tab-orders" class="tab-content">
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Ordered (Date & Time)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <tr><td colspan="7"><div class="loading-state"><div class="loading-spinner"></div>Loading orders...</div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consultations Tab -->
+            <div id="tab-consultations" class="tab-content">
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Ref ID</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Problem</th>
+                                    <th>Submitted (Date & Time)</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="consultations-table-body">
+                                <tr><td colspan="7"><div class="loading-state"><div class="loading-spinner"></div>Loading consultations...</div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiring Tab -->
+            <div id="tab-expiring" class="tab-content">
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Package</th>
+                                    <th>Expiry Date</th>
+                                    <th>Days Left</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiring-table-body">
+                                <tr><td colspan="7"><div class="loading-state"><div class="loading-spinner"></div>Loading...</div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         USER HISTORY MODAL (FULL RECORD POPUP)
+         ============================================ -->
+    <div id="history-modal" class="history-modal-overlay" onclick="if(event.target === this) closeHistoryModal()">
+        <div class="history-modal-box">
+            <div class="history-modal-header">
+                <h3 id="history-title">👤 User Details</h3>
+                <button class="history-close-btn" onclick="closeHistoryModal()">✕</button>
+            </div>
+            <div class="history-modal-body" id="history-body"></div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         FIREBASE SCRIPT (FIXED)
+         ============================================ -->
+        <!-- ============================================
+         FIREBASE SCRIPT (FIXED - FINAL)
+         ============================================ -->
+    <script type="module">
+        // ✅ 1. auth-global.js load होने का इंतज़ार करो
+        await new Promise(resolve => {
+            if (window.MDAuth) resolve();
+            else window.addEventListener('md-global-ready', resolve, { once: true });
+        });
+
+        // ✅ 2. अब user load होने का इंतज़ार करो (सबसे ज़रूरी)
+        await window.MDWaitForUser();
+
+        // ✅ 3. Firebase modules import करो
+        import { 
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged,
+            sendPasswordResetEmail
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            collection, 
+            getDocs,
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ✅ 4. Master से auth और db लो
+        const auth = window.MDAuth;
+        const db = window.MDDB;
+
+        const loginScreen = document.getElementById('admin-login-screen');
+        const dashboard = document.getElementById('admin-dashboard');
+        const loginForm = document.getElementById('admin-login-form');
+        const loginError = document.getElementById('login-error');
+        const loginSuccess = document.getElementById('login-success');
+        const loginBtn = document.getElementById('login-btn');
+
+        let allUsers = [];
+        let allPlans = [];
+        let allOrders = [];
+        let allConsultations = [];
+        let allServices = [];
+        let currentAdmin = null;
+
+        // ============================================
+        // DATE + TIME FORMATTERS
+        // ============================================
+        function formatDateTime(ts) {
+            if (!ts) return 'N/A';
+            try {
+                let date;
+                if (ts.toDate && typeof ts.toDate === 'function') {
+                    date = ts.toDate();
+                } else if (ts.seconds) {
+                    date = new Date(ts.seconds * 1000);
+                } else if (ts instanceof Date) {
+                    date = ts;
+                } else {
+                    date = new Date(ts);
+                }
+                if (isNaN(date.getTime())) return 'N/A';
+
+                const datePart = date.toLocaleDateString('en-IN', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                const timePart = date.toLocaleTimeString('en-IN', {
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                });
+                return { datePart, timePart, full: `${datePart} • ${timePart}` };
+            } catch { return 'N/A'; }
+        }
+
+        function renderDateTimeCell(ts) {
+            const dt = formatDateTime(ts);
+            if (dt === 'N/A') return '<span style="color:#999;">N/A</span>';
+            return `<div class="datetime-cell">
+                <div class="date-part">${dt.datePart}</div>
+                <div class="time-part">🕐 ${dt.timePart}</div>
+            </div>`;
+        }
+
+        // ============================================
+        // ADMIN CHECK
+        // ============================================
+        async function checkAdminStatus(uid) {
+            try {
+                const adminDoc = await getDoc(doc(db, "admins", uid));
+                return adminDoc.exists();
+            } catch (err) {
+                console.error("Admin check error:", err);
+                return false;
+            }
+        }
+
+        // ============================================
+        // AUTH OBSERVER
+        // ============================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const isAdmin = await checkAdminStatus(user.uid);
+                if (isAdmin) {
+                    currentAdmin = user;
+                    loginScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    document.getElementById('admin-name-display').textContent = 
+                        user.displayName || user.email.split('@')[0];
+                    await loadAllData();
+                } else {
+                    await signOut(auth);
+                    showLoginError("❌ You do not have admin access.");
+                }
+            } else {
+                loginScreen.style.display = 'flex';
+                dashboard.style.display = 'none';
+                currentAdmin = null;
+            }
+        });
+
+        // ============================================
+        // LOGIN
+        // ============================================
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.style.display = 'none';
+            loginSuccess.style.display = 'none';
+            loginBtn.textContent = "⏳ Logging in...";
+            loginBtn.disabled = true;
+
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                let msg = "❌ Invalid email or password.";
+                if (err.code === 'auth/user-not-found') msg = "❌ No account found.";
+                if (err.code === 'auth/wrong-password') msg = "❌ Incorrect password.";
+                if (err.code === 'auth/invalid-email') msg = "❌ Invalid email.";
+                if (err.code === 'auth/too-many-requests') msg = "❌ Too many attempts. Try later.";
+                showLoginError(msg);
+                loginBtn.textContent = "🔓 Login to Dashboard";
+                loginBtn.disabled = false;
+            }
+        });
+
+        function showLoginError(msg) {
+            loginError.textContent = msg;
+            loginError.style.display = 'block';
+            loginSuccess.style.display = 'none';
+            loginBtn.textContent = "🔓 Login to Dashboard";
+            loginBtn.disabled = false;
+        }
+
+        // ============================================
+        // FORGOT PASSWORD
+        // ============================================
+        document.getElementById('forgot-password-btn').addEventListener('click', async () => {
+            loginError.style.display = 'none';
+            loginSuccess.style.display = 'none';
+            
+            const email = document.getElementById('admin-email').value.trim();
+            
+            if (!email) {
+                showLoginError("❌ Please enter your email address first.");
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                loginSuccess.textContent = `✅ Password reset link sent to ${email}. Check your inbox/spam.`;
+                loginSuccess.style.display = 'block';
+                loginError.style.display = 'none';
+            } catch (err) {
+                let msg = "❌ Could not send reset email.";
+                if (err.code === 'auth/user-not-found') msg = "❌ No account found with this email.";
+                if (err.code === 'auth/invalid-email') msg = "❌ Invalid email format.";
+                if (err.code === 'auth/too-many-requests') msg = "❌ Too many attempts. Try later.";
+                showLoginError(msg);
+            }
+        });
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('admin-logout-btn').addEventListener('click', async () => {
+            if (confirm("Are you sure you want to logout?")) {
+                await signOut(auth);
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.reload();
+            }
+        });
+
+        // ============================================
+        // LOAD DATA
+        // ============================================
+        async function loadAllData() {
+            await Promise.all([
+                loadUsers(), 
+                loadPlans(), 
+                loadOrders(), 
+                loadConsultations(),
+                loadServices()
+            ]);
+            updateStats();
+            renderAllTables();
+        }
+
+        async function loadUsers() {
+            try {
+                const snapshot = await getDocs(collection(db, "users"));
+                allUsers = [];
+                snapshot.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
+            } catch (err) { console.error("Users error:", err); }
+        }
+
+        async function loadPlans() {
+            try {
+                const snapshot = await getDocs(collection(db, "subscriptions"));
+                allPlans = [];
+                snapshot.forEach(doc => allPlans.push({ id: doc.id, ...doc.data() }));
+            } catch (err) { console.error("Plans error:", err); }
+        }
+
+        async function loadOrders() {
+            try {
+                const snapshot = await getDocs(collection(db, "orders"));
+                allOrders = [];
+                snapshot.forEach(doc => allOrders.push({ id: doc.id, ...doc.data() }));
+            } catch (err) { console.error("Orders error:", err); }
+        }
+
+        async function loadServices() {
+            try {
+                const snapshot = await getDocs(collection(db, "services"));
+                allServices = [];
+                snapshot.forEach(doc => allServices.push({ id: doc.id, ...doc.data() }));
+                allServices.sort((a, b) => {
+                    const ta = a.bookedAt?.toDate?.() || new Date(0);
+                    const tb = b.bookedAt?.toDate?.() || new Date(0);
+                    return tb - ta;
+                });
+            } catch (err) { 
+                console.error("Services error:", err); 
+                allServices = [];
+            }
+        }
+
+        async function loadConsultations() {
+            try {
+                const snapshot = await getDocs(collection(db, "consultations"));
+                allConsultations = [];
+                snapshot.forEach(doc => allConsultations.push({ id: doc.id, ...doc.data() }));
+                allConsultations.sort((a, b) => {
+                    const ta = a.submittedAt?.toDate?.() || new Date(0);
+                    const tb = b.submittedAt?.toDate?.() || new Date(0);
+                    return tb - ta;
+                });
+            } catch (err) { console.error("Consultations error:", err); }
+        }
+
+        // ============================================
+        // STATS
+        // ============================================
+        function updateStats() {
+            document.getElementById('stat-total-users').textContent = allUsers.length;
+
+            let activeCount = 0, expiringCount = 0, expiredCount = 0;
+            const now = Date.now();
+
+            allPlans.forEach(plan => {
+                const expiry = new Date(plan.expiryDate || 0).getTime();
+                const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                if (daysLeft <= 0) expiredCount++;
+                else if (daysLeft <= 30) expiringCount++;
+                else activeCount++;
+            });
+
+            document.getElementById('stat-active-plans').textContent = activeCount;
+            document.getElementById('stat-expiring-soon').textContent = expiringCount;
+            document.getElementById('stat-expired').textContent = expiredCount;
+            document.getElementById('stat-total-orders').textContent = allOrders.length;
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function getUserName(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            return user ? (user.fullName || 'N/A') : 'Unknown';
+        }
+
+        function getUserPhone(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            return user ? (user.phone || 'N/A') : 'N/A';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            try {
+                return new Date(dateStr).toLocaleDateString('en-IN', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+            } catch { return 'N/A'; }
+        }
+
+        function getDaysLeft(expiryDate) {
+            if (!expiryDate) return 0;
+            const diff = new Date(expiryDate).getTime() - Date.now();
+            return Math.ceil(diff / (1000 * 60 * 60 * 24));
+        }
+
+        function cleanPhone(phone) {
+            return (phone || '').replace(/\D/g, '');
+        }
+
+        // ============================================
+        // RENDER TABLES
+        // ============================================
+        function renderAllTables() {
+            renderMembersTable();
+            renderPlansTable();
+            renderServicesTable();
+            renderOrdersTable();
+            renderExpiringTable();
+            renderConsultationsTable();
+        }
+
+        function renderMembersTable() {
+            const tbody = document.getElementById('members-table-body');
+            const search = (document.getElementById('search-input').value || '').toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value;
+
+            if (typeFilter !== 'all' && typeFilter !== 'members') {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">👥</div><h3>Filter set to "${typeFilter}"</h3><p>Change "All Types" to see members</p></div></td></tr>`;
+                return;
+            }
+
+            let filtered = allUsers.filter(u => {
+                if (!search) return true;
+                return (
+                    (u.fullName || '').toLowerCase().includes(search) ||
+                    (u.email || '').toLowerCase().includes(search) ||
+                    (u.phone || '').includes(search)
+                );
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">👥</div><h3>No members found</h3></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((u, i) => {
+                const phone = cleanPhone(u.phone);
+                const waLink = phone ? `https://wa.me/91${phone}` : '#';
+                return `
+                    <tr>
+                        <td data-label="#">${i + 1}</td>
+                        <td data-label="Name"><strong>${u.fullName || 'N/A'}</strong></td>
+                        <td data-label="Email">${u.email || 'N/A'}</td>
+                        <td data-label="Phone">${u.phone || 'N/A'}</td>
+                        <td data-label="City">${u.city || 'N/A'}</td>
+                        <td data-label="Joined">${renderDateTimeCell(u.createdAt)}</td>
+                        <td>
+                            <button class="view-btn" onclick="viewUserHistory('${u.id}')">👁 Full Record</button>
+                            ${phone ? `<a href="${waLink}" target="_blank" class="whatsapp-small" style="margin-left:5px;">💬</a>` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPlansTable() {
+            const tbody = document.getElementById('plans-table-body');
+            const search = (document.getElementById('search-input').value || '').toLowerCase();
+            const filter = document.getElementById('filter-select').value;
+            const typeFilter = document.getElementById('type-filter').value;
+
+            if (typeFilter !== 'all' && typeFilter !== 'plans') {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">📦</div><h3>Filter set to "${typeFilter}"</h3><p>Change "All Types" to see packages</p></div></td></tr>`;
+                return;
+            }
+
+            let filtered = allPlans.filter(p => {
+                const name = getUserName(p.userId).toLowerCase();
+                const phone = getUserPhone(p.userId);
+
+                if (search && !name.includes(search) && !phone.includes(search)) return false;
+
+                const daysLeft = getDaysLeft(p.expiryDate);
+                if (filter === 'active' && daysLeft <= 30) return false;
+                if (filter === 'expiring' && (daysLeft <= 0 || daysLeft > 30)) return false;
+                if (filter === 'expired' && daysLeft > 0) return false;
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">📦</div><h3>No packages found</h3></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((p, i) => {
+                const daysLeft = getDaysLeft(p.expiryDate);
+                let badge = '';
+                if (daysLeft <= 0) badge = '<span class="badge badge-expired">Expired</span>';
+                else if (daysLeft <= 30) badge = `<span class="badge badge-warning">⏳ ${daysLeft} days</span>`;
+                else badge = `<span class="badge badge-active">Active (${daysLeft}d)</span>`;
+
+                return `
+                    <tr>
+                        <td data-label="#">${i + 1}</td>
+                        <td data-label="Customer"><strong>${getUserName(p.userId)}</strong></td>
+                        <td data-label="Phone">${getUserPhone(p.userId)}</td>
+                        <td data-label="Package">${p.planName || 'N/A'}</td>
+                        <td data-label="Price">₹${p.price || '0'}</td>
+                        <td data-label="Purchased">${renderDateTimeCell(p.createdAt || p.startDate)}</td>
+                        <td data-label="Expiry">${formatDate(p.expiryDate)}</td>
+                        <td data-label="Status">${badge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderServicesTable() {
+            const tbody = document.getElementById('services-table-body');
+            if (!tbody) return;
+
+            const search = (document.getElementById('search-input').value || '').toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value;
+
+            if (typeFilter !== 'all' && typeFilter !== 'services') {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🛠️</div><h3>Filter set to "${typeFilter}"</h3><p>Change "All Types" to see services</p></div></td></tr>`;
+                return;
+            }
+
+            let filtered = allServices.filter(s => {
+                const name = getUserName(s.userId).toLowerCase();
+                const phone = getUserPhone(s.userId);
+                if (!search) return true;
+                return name.includes(search) || phone.includes(search) || (s.serviceType || '').toLowerCase().includes(search);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🛠️</div><h3>No service bookings yet</h3></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((s, i) => {
+                const phone = cleanPhone(getUserPhone(s.userId));
+                const waLink = `https://wa.me/91${phone}?text=Hi%20${encodeURIComponent(getUserName(s.userId))},%20regarding%20your%20${encodeURIComponent(s.serviceType || 'service')}%20booking.`;
+                const statusClass = s.status === 'completed' ? 'service-status-done' : 'service-status-pending';
+                
+                return `
+                    <tr>
+                        <td data-label="#">${i + 1}</td>
+                        <td data-label="Customer"><strong>${getUserName(s.userId)}</strong></td>
+                        <td data-label="Phone">${getUserPhone(s.userId)}</td>
+                        <td data-label="Service">${s.serviceType || s.title || 'N/A'}</td>
+                        <td data-label="Category"><span class="badge badge-service">${s.category || 'General'}</span></td>
+                        <td data-label="Booked">${renderDateTimeCell(s.bookedAt || s.createdAt)}</td>
+                        <td data-label="Status"><span class="${statusClass}">${s.status || 'Pending'}</span></td>
+                        <td data-label="Action">
+                            ${phone ? `<a href="${waLink}" target="_blank" class="whatsapp-small">💬 Chat</a>` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderOrdersTable() {
+            const tbody = document.getElementById('orders-table-body');
+            const search = (document.getElementById('search-input').value || '').toLowerCase();
+
+            let filtered = allOrders.filter(o => {
+                if (!search) return true;
+                const name = getUserName(o.userId).toLowerCase();
+                return name.includes(search) || o.id.toLowerCase().includes(search);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">🛒</div><h3>No orders yet</h3></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((o, i) => {
+                const items = o.items ? (Array.isArray(o.items) ? o.items.join(', ') : o.items) : 'Hardware Items';
+                return `
+                    <tr>
+                        <td data-label="#">${i + 1}</td>
+                        <td data-label="Order ID"><strong>#${o.id.substring(0, 8)}</strong></td>
+                        <td data-label="Customer">${getUserName(o.userId)}</td>
+                        <td data-label="Items">${items}</td>
+                        <td data-label="Amount">₹${o.totalAmount || '0'}</td>
+                        <td data-label="Status"><span class="badge badge-info">${o.status || 'Pending'}</span></td>
+                        <td data-label="Ordered">${renderDateTimeCell(o.createdAt)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderExpiringTable() {
+            const tbody = document.getElementById('expiring-table-body');
+
+            let expiring = allPlans.filter(p => {
+                const daysLeft = getDaysLeft(p.expiryDate);
+                return daysLeft > 0 && daysLeft <= 30;
+            });
+
+            expiring.sort((a, b) => getDaysLeft(a.expiryDate) - getDaysLeft(b.expiryDate));
+
+            if (expiring.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">✅</div><h3>No packages expiring soon</h3></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = expiring.map((p, i) => {
+                const daysLeft = getDaysLeft(p.expiryDate);
+                const phone = getUserPhone(p.userId);
+                const waLink = `https://wa.me/91${cleanPhone(phone)}?text=Hi, your ${p.planName} package expires in ${daysLeft} days. Please renew.`;
+
+                return `
+                    <tr>
+                        <td data-label="#">${i + 1}</td>
+                        <td data-label="Customer"><strong>${getUserName(p.userId)}</strong></td>
+                        <td data-label="Phone">${phone}</td>
+                        <td data-label="Package">${p.planName || 'N/A'}</td>
+                        <td data-label="Expiry">${formatDate(p.expiryDate)}</td>
+                        <td data-label="Days Left"><span class="badge badge-warning">⏳ ${daysLeft} days</span></td>
+                        <td data-label="Action"><a href="${waLink}" target="_blank" style="color: #25d366; font-weight: 700; text-decoration: none;">💬 Remind</a></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderConsultationsTable() {
+            const tbody = document.getElementById('consultations-table-body');
+            if (!tbody) return;
+
+            const search = (document.getElementById('search-input').value || '').toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value;
+
+            if (typeFilter !== 'all' && typeFilter !== 'consultations') {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">📋</div><h3>Filter set to "${typeFilter}"</h3><p>Change "All Types" to see consultations</p></div></td></tr>`;
+                return;
+            }
+
+            let filtered = allConsultations.filter(c => {
+                if (!search) return true;
+                return (
+                    (c.fullName || '').toLowerCase().includes(search) ||
+                    (c.phone || '').includes(search) ||
+                    (c.referenceId || '').toLowerCase().includes(search)
+                );
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">📋</div><h3>No consultations found</h3></div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => {
+                let statusBadge = '';
+                if (c.status === 'completed') statusBadge = '<span class="badge badge-active">✅ Completed</span>';
+                else statusBadge = '<span class="badge badge-warning">⏳ Pending</span>';
+
+                const problem = c.problemDescription || 'N/A';
+                const shortProblem = problem.length > 40 ? problem.substring(0, 40) + '...' : problem;
+
+                return `
+                    <tr>
+                        <td data-label="Ref ID"><strong style="color:#0b132b;font-family:monospace;">${c.referenceId || 'N/A'}</strong></td>
+                        <td data-label="Customer">
+                            <strong>${c.fullName || 'N/A'}</strong><br>
+                            <small style="color:#666;">📞 ${c.phone || 'N/A'}</small>
+                        </td>
+                        <td data-label="Phone">${c.phone || 'N/A'}</td>
+                        <td data-label="Problem">${shortProblem}</td>
+                        <td data-label="Submitted">${renderDateTimeCell(c.submittedAt)}</td>
+                        <td data-label="Status">${statusBadge}</td>
+                        <td>
+                            ${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank" class="view-btn" style="margin-right:5px; text-decoration:none; background:#007bff; color:#fff;">📄 Slip</a>` : ''}
+                            <a href="https://wa.me/91${(c.phone || '').replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(c.fullName)},%20we%20have%20received%20your%20consultation%20request%20(${c.referenceId})." target="_blank" class="whatsapp-small">
+                                💬 Chat
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ============================================
+        // SEARCH & FILTER
+        // ============================================
+        document.getElementById('search-input').addEventListener('input', () => {
+            renderMembersTable();
+            renderPlansTable();
+            renderServicesTable();
+            renderOrdersTable();
+            renderConsultationsTable();
+        });
+
+        document.getElementById('filter-select').addEventListener('change', () => {
+            renderPlansTable();
+        });
+
+        document.getElementById('type-filter').addEventListener('change', () => {
+            renderMembersTable();
+            renderPlansTable();
+            renderServicesTable();
+            renderConsultationsTable();
+        });
+
+        document.getElementById('refresh-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('refresh-btn');
+            btn.textContent = '⏳ Refreshing...';
+            await loadAllData();
+            btn.textContent = '🔄 Refresh';
+        });
+
+        // ============================================
+        // EXPORT CSV
+        // ============================================
+        document.getElementById('export-btn').addEventListener('click', () => {
+            const activeTab = document.querySelector('.admin-tab.active').dataset.tab;
+            const search = (document.getElementById('search-input').value || '').toLowerCase();
+            
+            let csv = '';
+            let filename = `md-enterprise-${activeTab}-${new Date().toISOString().split('T')[0]}.csv`;
+
+            if (activeTab === 'members') {
+                let filtered = allUsers.filter(u => 
+                    !search || 
+                    (u.fullName || '').toLowerCase().includes(search) ||
+                    (u.email || '').toLowerCase().includes(search) ||
+                    (u.phone || '').includes(search)
+                );
+                
+                if (filtered.length === 0) { alert("No data to export."); return; }
+                
+                csv = "Name,Email,Phone,City,Pincode,Joined\n";
+                filtered.forEach(u => {
+                    const dt = formatDateTime(u.createdAt);
+                    const joined = dt === 'N/A' ? 'N/A' : dt.full;
+                    csv += `"${u.fullName || ''}","${u.email || ''}","${u.phone || ''}","${u.city || ''}","${u.pincode || ''}","${joined}"\n`;
+                });
+            }
+            
+            else if (activeTab === 'plans') {
+                const filter = document.getElementById('filter-select').value;
+                let filtered = allPlans.filter(p => {
+                    const name = getUserName(p.userId).toLowerCase();
+                    const phone = getUserPhone(p.userId);
+                    if (search && !name.includes(search) && !phone.includes(search)) return false;
+                    
+                    const daysLeft = getDaysLeft(p.expiryDate);
+                    if (filter === 'active' && daysLeft <= 30) return false;
+                    if (filter === 'expiring' && (daysLeft <= 0 || daysLeft > 30)) return false;
+                    if (filter === 'expired' && daysLeft > 0) return false;
+                    return true;
+                });
+                
+                if (filtered.length === 0) { alert("No data to export."); return; }
+                
+                csv = "Customer,Phone,Package,Price,Purchased,Expiry,Status\n";
+                filtered.forEach(p => {
+                    const daysLeft = getDaysLeft(p.expiryDate);
+                    let status = daysLeft <= 0 ? 'Expired' : (daysLeft <= 30 ? 'Expiring Soon' : 'Active');
+                    const dt = formatDateTime(p.createdAt || p.startDate);
+                    const purchased = dt === 'N/A' ? 'N/A' : dt.full;
+                    csv += `"${getUserName(p.userId)}","${getUserPhone(p.userId)}","${p.planName || ''}","${p.price || ''}","${purchased}","${formatDate(p.expiryDate)}","${status}"\n`;
+                });
+            }
+
+            else if (activeTab === 'services') {
+                if (allServices.length === 0) { alert("No data to export."); return; }
+                csv = "Customer,Phone,Service,Category,Booked,Status\n";
+                allServices.forEach(s => {
+                    const dt = formatDateTime(s.bookedAt || s.createdAt);
+                    const booked = dt === 'N/A' ? 'N/A' : dt.full;
+                    csv += `"${getUserName(s.userId)}","${getUserPhone(s.userId)}","${s.serviceType || ''}","${s.category || ''}","${booked}","${s.status || 'Pending'}"\n`;
+                });
+            }
+            
+            else if (activeTab === 'orders') {
+                let filtered = allOrders.filter(o => 
+                    !search || 
+                    getUserName(o.userId).toLowerCase().includes(search) || 
+                    o.id.toLowerCase().includes(search)
+                );
+                
+                if (filtered.length === 0) { alert("No data to export."); return; }
+                
+                csv = "Order ID,Customer,Items,Amount,Status,Ordered\n";
+                filtered.forEach(o => {
+                    const items = o.items ? (Array.isArray(o.items) ? o.items.join(', ') : o.items) : 'Hardware Items';
+                    const dt = formatDateTime(o.createdAt);
+                    const ordered = dt === 'N/A' ? 'N/A' : dt.full;
+                    csv += `"#${o.id.substring(0, 8)}","${getUserName(o.userId)}","${items}","${o.totalAmount || ''}","${o.status || ''}","${ordered}"\n`;
+                });
+            }
+            
+            else if (activeTab === 'consultations') {
+                if (allConsultations.length === 0) { alert("No data to export."); return; }
+                
+                csv = "Ref ID,Name,Phone,Email,Problem,Submitted,Status\n";
+                allConsultations.forEach(c => {
+                    const problem = (c.problemDescription || '').replace(/"/g, '""');
+                    const dt = formatDateTime(c.submittedAt);
+                    const submitted = dt === 'N/A' ? 'N/A' : dt.full;
+                    csv += `"${c.referenceId || ''}","${c.fullName || ''}","${c.phone || ''}","${c.email || ''}","${problem}","${submitted}","${c.status || ''}"\n`;
+                });
+            }
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+
+        // ============================================
+        // VIEW USER HISTORY (FULL RECORD)
+        // ============================================
+        window.viewUserHistory = function(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) {
+                alert("User not found");
+                return;
+            }
+
+            const userPlans = allPlans.filter(p => p.userId === userId);
+            const userOrders = allOrders.filter(o => o.userId === userId);
+            const userConsultations = allConsultations.filter(c => c.userId === userId);
+            const userServices = allServices.filter(s => s.userId === userId);
+
+            let totalSpent = 0;
+            userPlans.forEach(p => totalSpent += parseInt(p.price) || 0);
+            userOrders.forEach(o => totalSpent += parseInt(o.totalAmount) || 0);
+
+            const activePlans = userPlans.filter(p => getDaysLeft(p.expiryDate) > 0).length;
+
+            let html = `
+                <div class="user-info-section">
+                    <h4>👤 Personal Information</h4>
+                    <div class="user-info-grid">
+                        <div class="user-info-item"><span class="label">📧 Email:</span> ${user.email || 'N/A'}</div>
+                        <div class="user-info-item"><span class="label">📞 Phone:</span> ${user.phone || 'N/A'}</div>
+                        <div class="user-info-item"><span class="label">🏠 Address:</span> ${user.address || 'N/A'}</div>
+                        <div class="user-info-item"><span class="label">🌆 City:</span> ${user.city || 'N/A'}</div>
+                        <div class="user-info-item"><span class="label">📮 Pincode:</span> ${user.pincode || 'N/A'}</div>
+                        <div class="user-info-item"><span class="label">📅 Joined:</span> ${formatDateTime(user.createdAt).full || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div class="user-stats-grid">
+                    <div class="user-stat-card">
+                        <div class="value">₹${totalSpent}</div>
+                        <div class="label">Total Spent</div>
+                    </div>
+                    <div class="user-stat-card">
+                        <div class="value">${activePlans}</div>
+                        <div class="label">Active Packages</div>
+                    </div>
+                    <div class="user-stat-card">
+                        <div class="value">${userOrders.length}</div>
+                        <div class="label">Orders</div>
+                    </div>
+                    <div class="user-stat-card">
+                        <div class="value">${userConsultations.length}</div>
+                        <div class="label">Consultations</div>
+                    </div>
+                    <div class="user-stat-card">
+                        <div class="value">${userServices.length}</div>
+                        <div class="label">Services</div>
+                    </div>
+                </div>
+
+                <div class="history-section">
+                    <h4>📦 Purchase History (${userPlans.length})</h4>
+                    ${userPlans.length === 0 ? '<div class="no-history">No packages purchased yet</div>' : 
+                        userPlans.map(p => {
+                            const daysLeft = getDaysLeft(p.expiryDate);
+                            let status = daysLeft > 30 ? 'Active' : (daysLeft > 0 ? 'Expiring' : 'Expired');
+                            return `
+                                <div class="history-item">
+                                    <div class="info">
+                                        <div class="title">${p.planName || 'Package'}</div>
+                                        <div class="details">Status: ${status} • ${p.remainingVisits || 'N/A'} visits</div>
+                                        <div class="date">📅 Purchased: ${formatDateTime(p.createdAt || p.startDate).full || 'N/A'}</div>
+                                        <div class="date">⏳ Expires: ${formatDate(p.expiryDate)}</div>
+                                    </div>
+                                    <div class="amount">₹${p.price || '0'}</div>
+                                </div>
+                            `;
+                        }).join('')
+                    }
+                </div>
+
+                <div class="history-section">
+                    <h4>🛠️ Service Bookings (${userServices.length})</h4>
+                    ${userServices.length === 0 ? '<div class="no-history">No service bookings yet</div>' :
+                        userServices.map(s => `
+                            <div class="history-item">
+                                <div class="info">
+                                    <div class="title">${s.serviceType || s.title || 'Service'}</div>
+                                    <div class="details">Category: ${s.category || 'General'} • Status: ${s.status || 'Pending'}</div>
+                                    <div class="date">📅 Booked: ${formatDateTime(s.bookedAt || s.createdAt).full || 'N/A'}</div>
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+
+                <div class="history-section">
+                    <h4>🛒 Order History (${userOrders.length})</h4>
+                    ${userOrders.length === 0 ? '<div class="no-history">No orders yet</div>' :
+                        userOrders.map(o => `
+                            <div class="history-item">
+                                <div class="info">
+                                    <div class="title">Order #${o.id.substring(0, 8)}</div>
+                                    <div class="details">${o.items ? (Array.isArray(o.items) ? o.items.join(', ') : o.items) : 'Items'}</div>
+                                    <div class="date">📅 Ordered: ${formatDateTime(o.createdAt).full || 'N/A'}</div>
+                                </div>
+                                <div class="amount">₹${o.totalAmount || '0'}</div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+
+                <div class="history-section">
+                    <h4>📋 Consultation Requests (${userConsultations.length})</h4>
+                    ${userConsultations.length === 0 ? '<div class="no-history">No consultation requests yet</div>' :
+                        userConsultations.map(c => `
+                            <div class="history-item">
+                                <div class="info">
+                                    <div class="title">${c.referenceId || 'Consultation'}</div>
+                                    <div class="details">Problem: ${(c.problemDescription || '').substring(0, 80)}${(c.problemDescription || '').length > 80 ? '...' : ''}</div>
+                                    <div class="date">📅 Submitted: ${formatDateTime(c.submittedAt).full || 'N/A'}</div>
+                                    <div class="date">Status: ${c.status || 'Pending'}</div>
+                                </div>
+                                ${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank" class="view-btn" style="text-decoration:none;background:#007bff;color:#fff;font-size:0.75rem;padding:8px 12px;">📄 Slip</a>` : ''}
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            `;
+
+            document.getElementById('history-body').innerHTML = html;
+            document.getElementById('history-title').textContent = `👤 ${user.fullName || 'User Details'}`;
+            document.getElementById('history-modal').classList.add('active');
+        };
+
+        window.closeHistoryModal = function() {
+            document.getElementById('history-modal').classList.remove('active');
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeHistoryModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <script type="module" src="auth-global.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - MD Enterprise</title>
+    
+    <link rel="stylesheet" href="desktop.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 5rem;
+            color: #22c55e;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+        .success-container h2 {
+            color: var(--primary-purple);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .success-container p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .order-details-box {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #334155;
+        }
+        .order-details-box p {
+            margin: 6px 0;
+            color: #334155;
+        }
+        .action-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .btn-home, .btn-store {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .btn-home {
+            background: var(--primary-purple);
+            color: #fff;
+        }
+        .btn-home:hover {
+            background: var(--purple-hover);
+        }
+        .btn-store {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+        .btn-store:hover {
+            background: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="standalone-solid-header">
+        <div class="logo-container">
+            <img src="images/maurya_logo.png" alt="MD Enterprise">
+            <h1>MD Enterprise</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="success-container">
+            <div class="success-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h2>Payment Successful!</h2>
+            <p>Thank you for shopping with <strong>MD Enterprise</strong>. Your order has been successfully placed and our team is preparing it for delivery.</p>
+
+            <div class="order-details-box">
+                <p><strong>📦 Order Status:</strong> Confirmed</p>
+                <p><strong>📍 Delivery Location:</strong> Barabanki & Lucknow Region</p>
+                <p><strong>📞 Support Helpline:</strong> +91 99185-82184</p>
+            </div>
+
+            <div class="action-btns">
+                <a href="index.html" class="btn-home">Go to Home</a>
+                <a href="store.html" class="btn-store">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <footer style="margin-top: 60px;">
+        <p>&copy; 2026 MD Enterprise. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>
