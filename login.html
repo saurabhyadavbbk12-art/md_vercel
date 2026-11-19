@@ -639,7 +639,7 @@ sessionStorage.removeItem('md_user_cache');
         async function loadUserPlans(uid) {
             const plansContainer = document.getElementById('plans-container');
             try {
-                const q = query(collection(db, "subscriptions"), where("userId", "==", uid));
+                const q = query(collection(db, "packages"), where("userId", "==", uid));
                 const querySnapshot = await getDocs(q);
                 if (querySnapshot.empty) {
                     plansContainer.innerHTML = `<div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px dashed #ccc; width: 100%;"><p style="margin-bottom: 5px;">No active repair package found.</p><a href="packages.html" class="btn-primary" style="display: inline-block; margin-top: 5px; font-size: 0.85rem; padding: 6px 12px; border-radius: 4px;">Browse Repair Packages ➔</a></div>`;
