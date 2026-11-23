@@ -270,7 +270,6 @@
             });
         }
 
-        // Close modal when clicking outside (Background overlay)
         const productModal = document.getElementById('productModal');
         if (productModal) {
             productModal.addEventListener('click', (e) => {
@@ -484,13 +483,28 @@
 
     async function startRazorpayPayment(product) {
         try {
-            const response = await fetch('https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/createOrder', {
+            if (!currentUser || !currentUser.uid) {
+                showCustomAlert("🔐 Please log in to your account first to place an order.", "login.html");
+                return;
+            }
+
+            const response = await fetch('/api/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: product.price, productId: product.id })
+                body: JSON.stringify({
+                    amount: product.price,
+                    currency: "INR",
+                    userId: currentUser.uid,
+                    productId: product.id,
+                    itemType: "product"
+                })
             });
-            if (!response.ok) throw new Error('Order creation failed');
+
             const order = await response.json();
+            if (!response.ok || !order.id) {
+                throw new Error(order.error || 'Order creation failed');
+            }
+
             const options = {
                 key: "rzp_test_U1ZvGyuSm4AOSN",
                 amount: order.amount,
@@ -498,17 +512,25 @@
                 name: "MD Enterprise",
                 description: product.title,
                 order_id: order.id,
-              handler: function (response) {
-    // 1. आप चाहें तो कंसोल में पेमेंट आईडी देख सकते हैं
-    console.log("Payment ID: " + response.razorpay_payment_id);
-    
-    // 2. पेमेंट सफल होते ही सीधे हमारे सुंदर सक्सेस पेज पर भेज दें
-    window.location.href = "payment-success.html?payment_id=" + response.razorpay_payment_id;
-},
+                handler: function (response) {
+                    console.log("Payment ID: " + response.razorpay_payment_id);
+                    window.location.href = "payment-success.html?payment_id=" + response.razorpay_payment_id;
+                },
                 prefill: {
                     name: currentUserData.fullName || (currentUser && currentUser.displayName) || "Customer",
                     email: (currentUser && currentUser.email) || "",
                     contact: currentUserData.phone || ""
+                },
+                notes: {
+                    userId: currentUser.uid,
+                    productId: product.id,
+                    itemType: "product",
+                    itemTitle: product.title,
+                    deliveryName: currentUserData.fullName || "Customer",
+                    deliveryPhone: currentUserData.phone,
+                    deliveryAddress: currentUserData.address,
+                    deliveryCity: currentUserData.city,
+                    deliveryPincode: currentUserData.pincode
                 },
                 theme: { color: "#5e2b97" }
             };
